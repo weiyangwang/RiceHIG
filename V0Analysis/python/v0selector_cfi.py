@@ -13,6 +13,6 @@ selectV0CandidatesNew = cms.EDProducer('V0Selector',
   vtxChi2Cut      = cms.double(10000.0),
   cosThetaCut     = cms.double(0.999),
   decayLSigCut    = cms.double(5.0),
-  misIDMassCut_   = cms.double(0.020),
-  misIDMassCutEE_ = cms.double(0.015)
+  misIDMassCut   = cms.double(0.020),
+  misIDMassCutEE = cms.double(0.015)
 )
