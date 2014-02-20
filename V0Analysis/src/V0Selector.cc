@@ -21,6 +21,15 @@
 
 #include "RiceHIG/V0Analysis/interface/V0Selector.h"
 
+const double piMass = 0.13957018;
+const double piMassSquared = piMass*piMass;
+const double protonMass = 0.93827203;
+const double protonMassSquared = protonMass*protonMass;
+const double electronMass = 0.000511;
+const double electronMassSquared = electronMass*electronMass;
+const double lambdaMass = 1.115683;
+const double kshortMass = 0.497614; 
+
 // Constructor
 V0Selector::V0Selector(const edm::ParameterSet& iConfig) 
 {
@@ -38,7 +47,8 @@ V0Selector::V0Selector(const edm::ParameterSet& iConfig)
   vtxChi2Cut_     = iConfig.getParameter<double>("vtxChi2Cut");
   cosThetaCut_    = iConfig.getParameter<double>("cosThetaCut");
   decayLSigCut_   = iConfig.getParameter<double>("decayLSigCut");
-
+  misIDMassCut_   = iConfig.getParameter<double>("misIDMassCut");
+  misIDMassCutEE_ = iConfig.getParameter<double>("misIDMassCutEE");
   // Trying this with Candidates instead of the simple reco::Vertex
   produces< reco::VertexCompositeCandidateCollection >(v0IDName_);
 
@@ -152,6 +162,47 @@ void V0Selector::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
        double dlerror = sqrt(ROOT::Math::Similarity(totalCov, distanceVector))/dl;
        double dlos = dl/dlerror;
        if(dlos < decayLSigCut_) continue;
+
+       double pd1 = dau1->p();
+       double charged1 = dau1->charge();
+       double pd2 = dau2->p();
+       double charged2 = dau2->charge();
+
+       TVector3 dauvec1(dau1->px(),dau1->py(),dau1->pz());
+       TVector3 dauvec2(dau2->px(),dau2->py(),dau2->pz());
+       TVector3 dauvecsum(dauvec1+dauvec2);
+
+       double energyd1e = sqrt(electronMassSquared+pd1*pd1);
+       double energyd2e = sqrt(electronMassSquared+pd2*pd2);
+       double invmass_ee = sqrt((energyd1e+energyd2e)*(energyd1e+energyd2e)-dauvecsum.Mag2());
+       if(invmass_ee<misIDMassCutEE_) continue;
+
+       if(v0IDName_ == "Lambda")
+       {
+         double massd1=piMass;
+         double massd2=piMass;
+         double energyd1 = sqrt(massd1*massd1+pd1*pd1);
+         double energyd2 = sqrt(massd2*massd2+pd2*pd2);
+         double invmass = sqrt((energyd1+energyd2)*(energyd1+energyd2)-dauvecsum.Mag2());
+         if(fabs(invmass-kshortMass)<misIDMassCut_) continue;
+       }
+
+       if(v0IDName_ == "Kshort")
+       {
+         double massd1=piMass;
+         double massd2=protonMass;
+         double energyd1 = sqrt(massd1*massd1+pd1*pd1);
+         double energyd2 = sqrt(massd2*massd2+pd2*pd2);
+         double invmass = sqrt((energyd1+energyd2)*(energyd1+energyd2)-dauvecsum.Mag2());
+         if(fabs(invmass-lambdaMass)<misIDMassCut_) continue;
+
+         massd2=piMass;
+         massd1=protonMass;
+         energyd1 = sqrt(massd1*massd1+pd1*pd1);
+         energyd2 = sqrt(massd2*massd2+pd2*pd2);
+         invmass = sqrt((energyd1+energyd2)*(energyd1+energyd2)-dauvecsum.Mag2());
+         if(fabs(invmass-lambdaMass)<misIDMassCut_) continue;
+       }
 
        theNewV0Cands->push_back( *v0cand );
    }

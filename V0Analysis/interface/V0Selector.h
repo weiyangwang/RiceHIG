@@ -74,6 +74,8 @@ private:
   double vtxChi2Cut_;
   double cosThetaCut_;
   double decayLSigCut_;
+  double misIDMassCut_;
+  double misIDMassCutEE_;
 };
 
 #endif
