@@ -194,22 +194,28 @@ private:
   MonitorElement* ksEffVsR_num;
   MonitorElement* ksEffVsEta_num;
   MonitorElement* ksEffVsPt_num;
+  MonitorElement* ksEffVsEtaPt_num;
   MonitorElement* ksTkEffVsR_num;
   MonitorElement* ksTkEffVsEta_num;
   MonitorElement* ksTkEffVsPt_num;
+  MonitorElement* ksTkEffVsEtaPt_num;
   MonitorElement* ksFakeVsR_num;
   MonitorElement* ksFakeVsEta_num;
   MonitorElement* ksFakeVsPt_num;
+  MonitorElement* ksFakeVsEtaPt_num;
   MonitorElement* ksTkFakeVsR_num;
   MonitorElement* ksTkFakeVsEta_num;
   MonitorElement* ksTkFakeVsPt_num;
+  MonitorElement* ksTkFakeVsEtaPt_num;
 
   MonitorElement* ksFakeVsR_denom;
   MonitorElement* ksFakeVsEta_denom;
   MonitorElement* ksFakeVsPt_denom;
+  MonitorElement* ksFakeVsEtaPt_denom;
   MonitorElement* ksEffVsR_denom;
   MonitorElement* ksEffVsEta_denom;
   MonitorElement* ksEffVsPt_denom;
+  MonitorElement* ksEffVsEtaPt_denom;
 
   MonitorElement* lamFakeVsR_denom;
   MonitorElement* lamFakeVsEta_denom;
@@ -217,6 +223,7 @@ private:
   MonitorElement* lamEffVsR_denom;
   MonitorElement* lamEffVsEta_denom;
   MonitorElement* lamEffVsPt_denom;
+  MonitorElement* lamEffVsEtaPt_denom;
 
   MonitorElement* lamEffVsR;
   MonitorElement* lamEffVsEta;
@@ -234,15 +241,19 @@ private:
   MonitorElement* lamEffVsR_num;
   MonitorElement* lamEffVsEta_num;
   MonitorElement* lamEffVsPt_num;
+  MonitorElement* lamEffVsEtaPt_num;
   MonitorElement* lamTkEffVsR_num;
   MonitorElement* lamTkEffVsEta_num;
   MonitorElement* lamTkEffVsPt_num;
+  MonitorElement* lamTkEffVsEtaPt_num;
   MonitorElement* lamFakeVsR_num;
   MonitorElement* lamFakeVsEta_num;
   MonitorElement* lamFakeVsPt_num;
+  MonitorElement* lamFakeVsEtaPt_num;
   MonitorElement* lamTkFakeVsR_num;
   MonitorElement* lamTkFakeVsEta_num;
   MonitorElement* lamTkFakeVsPt_num;
+  MonitorElement* lamTkFakeVsEtaPt_num;
 
   MonitorElement* ksXResolution;
   MonitorElement* ksYResolution;

@@ -61,7 +61,7 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   ksEffVsEta = theDQMstore->book1D("K0sEffVsEta",
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
   ksEffVsPt = theDQMstore->book1D("K0sEffVsPt",
-			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
+			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);
 
   ksTkEffVsR = theDQMstore->book1D("K0sTkEffVsR", 
 			  "K^{0}_{S} Tracking Efficiency vs #rho", 40, 0., 40.);
@@ -76,6 +76,8 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
   ksEffVsPt_num = theDQMstore->book1D("K0sEffVsPt_num",
 			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
+  ksEffVsEtaPt_num = theDQMstore->book2D("K0sEffVsEtaPt_num",
+                           "K^{0}_{S} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
 
   ksTkEffVsR_num = theDQMstore->book1D("K0sTkEffVsR_num", 
 			  "K^{0}_{S} Tracking Efficiency vs #rho", 40, 0., 40.);
@@ -83,7 +85,8 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			    "K^{0}_{S} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
   ksTkEffVsPt_num = theDQMstore->book1D("K0sTkEffVsPt_num",
 			   "K^{0}_{S} Tracking Efficiency vs p_{T}", 70, 0., 20.);;
-
+  ksTkEffVsEtaPt_num = theDQMstore->book2D("K0sTkEffVsEtaPt_num",
+                           "K^{0}_{S} Tracking Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
 
   ksEffVsR_denom = theDQMstore->book1D("K0sEffVsR_denom", 
 			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
@@ -91,7 +94,8 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
   ksEffVsPt_denom = theDQMstore->book1D("K0sEffVsPt_denom",
 			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
-
+  ksEffVsEtaPt_denom = theDQMstore->book2D("K0sEffVsEtaPt_denom",
+                           "K^{0}_{S} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
 
   lamEffVsR = theDQMstore->book1D("LamEffVsR",
 			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
@@ -99,7 +103,6 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
   lamEffVsPt = theDQMstore->book1D("LamEffVsPt",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-
 
   lamTkEffVsR = theDQMstore->book1D("LamTkEffVsR",
 			   "#Lambda^{0} TrackingEfficiency vs #rho", 40, 0., 40.);
@@ -114,7 +117,8 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
   lamEffVsPt_num = theDQMstore->book1D("LamEffVsPt_num",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-
+  lamEffVsEtaPt_num = theDQMstore->book2D("LamEffVsEtaPt_num",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
 
   lamTkEffVsR_num = theDQMstore->book1D("LamTkEffVsR_num",
 			   "#Lambda^{0} TrackingEfficiency vs #rho", 40, 0., 40.);
@@ -122,7 +126,8 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "#Lambda^{0} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
   lamTkEffVsPt_num = theDQMstore->book1D("LamTkEffVsPt_num",
 			    "#Lambda^{0} Tracking Efficiency vs p_{T}", 70, 0., 20.);
-
+  lamTkEffVsEtaPt_num = theDQMstore->book2D("LamTkEffVsEtaPt_num",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
 
   lamEffVsR_denom = theDQMstore->book1D("LamEffVsR_denom",
 			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
@@ -130,7 +135,8 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
   lamEffVsPt_denom = theDQMstore->book1D("LamEffVsPt_denom",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-
+  lamEffVsEtaPt_denom = theDQMstore->book2D("LamEffVsEtaPt_denom",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
 
   ksFakeVsR = theDQMstore->book1D("K0sFakeVsR",
 			   "K^{0}_{S} Fake Rate vs #rho", 40, 0., 40.);
@@ -934,23 +940,20 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			}
 			lamEffVsR_denom->Fill(LamGenR);
 		      }
-		      if(abs(LamGenEta) > 0.) {
+		      if(abs(LamGenEta) > 0. && LamGenpT > 0.) {
 			if(LamGenStatus == 1) {
 			  lamEffVsEta_num->Fill(LamGenEta);
+                          lamEffVsPt_num->Fill(LamGenpT);
+                          lamEffVsEtaPt_num->Fill(LamGenEta,LamGenpT);
 			}
 			if((double) LamGenStatus < 2.5) {
 			  lamTkEffVsEta_num->Fill(LamGenEta);
+                          lamTkEffVsPt_num->Fill(LamGenpT);
+                          lamTkEffVsEtaPt_num->Fill(LamGenEta,LamGenpT);
 			}
 			lamEffVsEta_denom->Fill(LamGenEta);
-		      }
-		      if(LamGenpT > 0.) {
-			if(LamGenStatus == 1) {
-			  lamEffVsPt_num->Fill(LamGenpT);
-			}
-			if((double) LamGenStatus < 2.5) {
-			  lamTkEffVsPt_num->Fill(LamGenpT);
-			}
-			lamEffVsPt_denom->Fill(LamGenpT);
+                        lamEffVsPt_denom->Fill(LamGenpT);
+                        lamEffVsEtaPt_denom->Fill(LamGenEta,LamGenpT);
 		      }
 		    }
 		  }
@@ -1082,23 +1085,20 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			}
 			ksEffVsR_denom->Fill(K0sGenR);
 		      }
-		      if(abs(K0sGenEta) > 0.) {
+		      if(abs(K0sGenEta) > 0. && K0sGenpT > 0.) {
 			if(K0sGenStatus == 1) {
 			  ksEffVsEta_num->Fill(K0sGenEta);
+                          ksEffVsPt_num->Fill(K0sGenpT);
+                          ksEffVsEtaPt_num->Fill(K0sGenEta,K0sGenpT);
 			}
 			if((double) K0sGenStatus < 2.5) {
 			  ksTkEffVsEta_num->Fill(K0sGenEta);
+                          ksTkEffVsPt_num->Fill(K0sGenpT);
+                          ksTkEffVsEtaPt_num->Fill(K0sGenEta,K0sGenpT);
 			}
 			ksEffVsEta_denom->Fill(K0sGenEta);
-		      }
-		      if(K0sGenpT > 0.) {
-			if(K0sGenStatus == 1) {
-			  ksEffVsPt_num->Fill(K0sGenpT);
-			}
-			if((double) K0sGenStatus < 2.5) {
-			  ksTkEffVsPt_num->Fill(K0sGenpT);
-			}
-			ksEffVsPt_denom->Fill(K0sGenpT);
+                        ksEffVsPt_denom->Fill(K0sGenpT);
+                        ksEffVsEtaPt_denom->Fill(K0sGenEta,K0sGenpT);
 		      }
 		    }
 		  }
