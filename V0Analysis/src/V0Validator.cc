@@ -681,7 +681,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   mass = 0.;
   radDist.clear();
   // Lambdas
-  if ( lambdaCollection->size() > 0 ) {
+  if ( lambdaCollection.isValid() && lambdaCollection->size() > 0 ) {
     vector<reco::TrackRef> theDaughterTracks;
     for( reco::VertexCompositeCandidateCollection::const_iterator iLam = lambdaCollection->begin();
 	 iLam != lambdaCollection->end();

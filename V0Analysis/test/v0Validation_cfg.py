@@ -27,21 +27,21 @@ process.source = cms.Source("PoolSource",
 
 ### validation-specific includes
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
-process.load("RiceHIG.V0Analysis.v0selector_cfi")
-process.load("RiceHIG.V0Analysis.v0validator_cfi")
+process.load("RiceHIG.V0Analysis.v0selector_cff")
+process.load("RiceHIG.V0Analysis.v0validator_cff")
 process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")
 process.load("DQMServices.Components.EDMtoMEConverter_cff")
 
-process.load("Validation.Configuration.postValidation_cff")
-
 process.v0Validator.DQMRootFileName = 'v0validation.root'
-process.v0Validator.kShortCollection = cms.InputTag('selectV0CandidatesNew:Kshort')
+process.v0Validator.kShortCollection = cms.InputTag('selectV0CandidatesNewkshort:Kshort')
+process.v0Validator.lambdaCollection = cms.InputTag('selectV0CandidatesNewlambda:Lambda')
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
 )
 
-process.v0validation = cms.Sequence(process.selectV0CandidatesNew*process.v0Validator)
+process.v0validation = cms.Sequence(process.selectV0CandidatesNewlambda*process.selectV0CandidatesNewkshort*process.v0Validator)
+
 process.p = cms.Path(process.v0validation)
 
 process.schedule = cms.Schedule(process.p)
