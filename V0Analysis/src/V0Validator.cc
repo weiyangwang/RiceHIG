@@ -262,6 +262,18 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   goodLamMass = theDQMstore->book1D("lamMassGood",
 			      "Mass of good Lambda",
 			      lamMassNbins, minLamMass, maxLamMass);
+  fakeKsMassPt = theDQMstore->book2D("ksMassPtFake",
+                             "Mass vs p_{T} of fake K0S",
+                             100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
+  goodKsMassPt = theDQMstore->book2D("ksMassPtGood",
+                             "Mass vs p_{T} of good reco K0S",
+                             100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
+  fakeLamMassPt = theDQMstore->book2D("lamMassPtFake",
+                              "Mass vs p_{T} of fake Lambda",
+                              100, 0, 10.0, lamMassNbins, minLamMass, maxLamMass);
+  goodLamMassPt = theDQMstore->book2D("lamMassPtGood",
+                              "Mass vs p_{T} of good Lambda",
+                              100, 0, 10.0, lamMassNbins, minLamMass, maxLamMass);
 
   ksMassAll = theDQMstore->book1D("ksMassAll",
 				  "Invariant mass of all K0S",
@@ -269,6 +281,12 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   lamMassAll = theDQMstore->book1D("lamMassAll",
 				   "Invariant mass of all #Lambda^{0}",
 				   lamMassNbins, lamMassXmin, lamMassXmax);
+  ksMassPtAll = theDQMstore->book2D("ksMassPtAll",
+                                  "Invariant mass vs p_{T} of all K0S", 
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  lamMassPtAll = theDQMstore->book2D("lamMassPtAll",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
 
   ksFakeDauRadDist = theDQMstore->book1D("radDistFakeKs",
 				   "Production radius of daughter particle of Ks fake",
@@ -544,6 +562,8 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector< pair<TrackingParticleRef, TrackingParticleRef> > trueLams;
   std::vector<double> trueKsMasses;
   std::vector<double> trueLamMasses;
+  std::vector<double> trueKsPt;
+  std::vector<double> trueLamPt;
 
   //////////////////////////////
   // Do fake rate calculation //
@@ -560,14 +580,15 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for( reco::VertexCompositeCandidateCollection::const_iterator iK0s = k0sCollection->begin();
 	 iK0s != k0sCollection->end();
 	 iK0s++) {
-      // Fill mass of all K0S
-      ksMassAll->Fill( iK0s->mass() );
       // Fill values to be histogrammed
       K0sCandpT = (sqrt( iK0s->momentum().perp2() ));
       K0sCandEta = iK0s->momentum().eta();
       K0sCandR = (sqrt( iK0s->vertex().perp2() ));
       K0sCandStatus = 0;
       mass = iK0s->mass();
+
+      ksMassAll->Fill( mass );
+      ksMassPtAll->Fill( K0sCandpT, mass );
 
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iK0s->daughter(0)) )).track() );
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iK0s->daughter(1)) )).track() );
@@ -618,6 +639,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			// Pushing back a good V0
 			trueK0s.push_back(pair);
 			trueKsMasses.push_back(mass);
+                        trueKsPt.push_back(K0sCandpT);
 		      }
 		      else {
 			K0sCandStatus = 2;
@@ -662,6 +684,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	ksFakeVsPt_num->Fill(K0sCandpT);
 	ksCandStatus->Fill((float) K0sCandStatus);
 	fakeKsMass->Fill(mass);
+        fakeKsMassPt->Fill(K0sCandpT,mass);
 	for( unsigned int ndx = 0; ndx < radDist.size(); ndx++ ) {
 	  ksFakeDauRadDist->Fill(radDist[ndx]);
 	}
@@ -701,6 +724,9 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       LamCandStatus = 0;
       mass = iLam->mass();
       
+      lamMassAll->Fill( mass );
+      lamMassPtAll->Fill( LamCandpT, mass );
+
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iLam->daughter(0)) )).track() );
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iLam->daughter(1)) )).track() );
       
@@ -750,6 +776,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			// Pushing back a good V0
 			trueLams.push_back(pair);
 			trueLamMasses.push_back(mass);
+                        trueLamPt.push_back(LamCandpT);
 		      }
 		      else {
 			LamCandStatus = 2;
@@ -794,6 +821,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	lamFakeVsPt_num->Fill(LamCandpT);
 	lamCandStatus->Fill((float) LamCandStatus);
 	fakeLamMass->Fill(mass);
+        fakeLamMassPt->Fill(LamCandpT,mass);
 	for( unsigned int ndx = 0; ndx < radDist.size(); ndx++ ) {
 	  lamFakeDauRadDist->Fill(radDist[ndx]);
 	}
@@ -879,6 +907,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			    LamGenStatus = 1;
 			    //cout << "Maybe it's here.." << endl;
 			    goodLamMass->Fill(trueLamMasses[loop_1]);
+                            goodLamMassPt->Fill(trueLamPt[loop_1],trueLamMasses[loop_1]);
 			    break;
 			  }
 			  else {
@@ -1018,11 +1047,13 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			    realK0sFoundEff++;
 			    K0sGenStatus = 1;
 			    goodKsMass->Fill(trueKsMasses[loop_2]);
+                            goodKsMassPt->Fill(trueKsPt[loop_2],trueKsMasses[loop_2]);
 			    break;
 			  }
 			  else {
 			    K0sGenStatus = 2;
 			  }
+                          loop_2++;
 			}
 		      }
 		      else {

@@ -274,10 +274,15 @@ private:
   MonitorElement* goodKsMass;
   MonitorElement* fakeLamMass;
   MonitorElement* goodLamMass;
+  MonitorElement* fakeKsMassPt;
+  MonitorElement* goodKsMassPt;
+  MonitorElement* fakeLamMassPt;
+  MonitorElement* goodLamMassPt;
 
   MonitorElement* ksMassAll;
   MonitorElement* lamMassAll;
-
+  MonitorElement* ksMassPtAll;
+  MonitorElement* lamMassPtAll;
 
   MonitorElement* ksFakeDauRadDist;
   MonitorElement* lamFakeDauRadDist;
