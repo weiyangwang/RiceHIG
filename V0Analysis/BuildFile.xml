@@ -25,6 +25,7 @@
 <use   name="SimTracker/TrackerHitAssociation"/>
 <use   name="SimTracker/TrackHistory"/>
 <use   name="CommonTools/Statistics"/>
+<use   name="CommonTools/UtilAlgos"/>
 <use   name="clhep"/>
 <use   name="boost"/>
 <use   name="hepmc"/>

@@ -32,13 +32,11 @@ const double protonMass = 0.93827203;
 const double protonMassSquared = protonMass*protonMass;
 
 V0Validator::V0Validator(const edm::ParameterSet& iConfig) : 
-  theDQMRootFileName(iConfig.getParameter<std::string>("DQMRootFileName")),
   k0sCollectionTag(iConfig.getParameter<edm::InputTag>("kShortCollection")),
-  lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection")),
-  dirName(iConfig.getParameter<std::string>("dirName")) {
-  genLam = genK0s = realLamFoundEff = realK0sFoundEff = lamCandFound = 
+  lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection"))
+{
+    genLam = genK0s = realLamFoundEff = realK0sFoundEff = lamCandFound = 
     k0sCandFound = noTPforK0sCand = noTPforLamCand = realK0sFound = realLamFound = 0;
-  theDQMstore = edm::Service<DQMStore>().operator->();
 }
 
 
@@ -52,413 +50,203 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   //std::cout << "In beginJob() at line 1" << std::endl;
   //edm::Service<TFileService> fs;
 
-//  theDQMstore->cd();
-//  std::string subDirName = dirName + "/EffFakes";
-//  theDQMstore->setCurrentFolder(subDirName.c_str());
+  TH1::SetDefaultSumw2();
 
-  ksEffVsR = theDQMstore->book1D("K0sEffVsR", 
+  const double small = 1e-3;
+  double pt;
+  // simple rebinning possible with a rebinning facto n = 2, 3, 6 !
+  for(pt =   0  ; pt <   2.0-small; pt +=  0.2) ptBins.push_back(pt); 
+  for(pt =   2.0; pt <   3.0-small; pt +=  0.5 ) ptBins.push_back(pt); 
+  for(pt =   3.0; pt <   6.0-small; pt +=  1.0 ) ptBins.push_back(pt);
+  for(pt =   6.0; pt <  10.0-small; pt +=  2.0 ) ptBins.push_back(pt); 
+  ptBins.push_back(10.0);
+
+  double etaMin   = -2.4;
+  double etaMax   =  2.4;
+  double etaWidth =  0.8;
+  for(double eta = etaMin; eta < etaMax + etaWidth/2; eta += etaWidth)
+    etaBins.push_back(eta);
+
+  ksEffVsR_num = theDQMstore->make<TH1D>("K0sEffVsR_num", 
 			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
-  ksEffVsEta = theDQMstore->book1D("K0sEffVsEta",
+  ksEffVsEta_num = theDQMstore->make<TH1D>("K0sEffVsEta_num",
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
-  ksEffVsPt = theDQMstore->book1D("K0sEffVsPt",
-			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);
-
-  ksTkEffVsR = theDQMstore->book1D("K0sTkEffVsR", 
-			  "K^{0}_{S} Tracking Efficiency vs #rho", 40, 0., 40.);
-  ksTkEffVsEta = theDQMstore->book1D("K0sTkEffVsEta",
-			    "K^{0}_{S} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
-  ksTkEffVsPt = theDQMstore->book1D("K0sTkEffVsPt",
-			   "K^{0}_{S} Tracking Efficiency vs p_{T}", 70, 0., 20.);
-
-  ksEffVsR_num = theDQMstore->book1D("K0sEffVsR_num", 
-			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
-  ksEffVsEta_num = theDQMstore->book1D("K0sEffVsEta_num",
-			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
-  ksEffVsPt_num = theDQMstore->book1D("K0sEffVsPt_num",
+  ksEffVsPt_num = theDQMstore->make<TH1D>("K0sEffVsPt_num",
 			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
-  ksEffVsEtaPt_num = theDQMstore->book2D("K0sEffVsEtaPt_num",
-                           "K^{0}_{S} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
+  ksEffVsEtaPt_num = theDQMstore->make<TH2D>("K0sEffVsEtaPt_num",
+                           "K^{0}_{S} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
-  ksTkEffVsR_num = theDQMstore->book1D("K0sTkEffVsR_num", 
+  ksTkEffVsR_num = theDQMstore->make<TH1D>("K0sTkEffVsR_num", 
 			  "K^{0}_{S} Tracking Efficiency vs #rho", 40, 0., 40.);
-  ksTkEffVsEta_num = theDQMstore->book1D("K0sTkEffVsEta_num",
+  ksTkEffVsEta_num = theDQMstore->make<TH1D>("K0sTkEffVsEta_num",
 			    "K^{0}_{S} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
-  ksTkEffVsPt_num = theDQMstore->book1D("K0sTkEffVsPt_num",
+  ksTkEffVsPt_num = theDQMstore->make<TH1D>("K0sTkEffVsPt_num",
 			   "K^{0}_{S} Tracking Efficiency vs p_{T}", 70, 0., 20.);;
-  ksTkEffVsEtaPt_num = theDQMstore->book2D("K0sTkEffVsEtaPt_num",
-                           "K^{0}_{S} Tracking Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
+  ksTkEffVsEtaPt_num = theDQMstore->make<TH2D>("K0sTkEffVsEtaPt_num",
+                           "K^{0}_{S} Tracking Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
-  ksEffVsR_denom = theDQMstore->book1D("K0sEffVsR_denom", 
+  ksEffVsR_denom = theDQMstore->make<TH1D>("K0sEffVsR_denom", 
 			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
-  ksEffVsEta_denom = theDQMstore->book1D("K0sEffVsEta_denom",
+  ksEffVsEta_denom = theDQMstore->make<TH1D>("K0sEffVsEta_denom",
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
-  ksEffVsPt_denom = theDQMstore->book1D("K0sEffVsPt_denom",
-			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
-  ksEffVsEtaPt_denom = theDQMstore->book2D("K0sEffVsEtaPt_denom",
-                           "K^{0}_{S} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
+  ksEffVsPt_denom = theDQMstore->make<TH1D>("K0sEffVsPt_denom",
+			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);
+  ksEffVsEtaPt_denom = theDQMstore->make<TH2D>("K0sEffVsEtaPt_denom",
+                           "K^{0}_{S} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
-  lamEffVsR = theDQMstore->book1D("LamEffVsR",
+  lamEffVsR_num = theDQMstore->make<TH1D>("LamEffVsR_num",
 			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
-  lamEffVsEta = theDQMstore->book1D("LamEffVsEta",
+  lamEffVsEta_num = theDQMstore->make<TH1D>("LamEffVsEta_num",
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
-  lamEffVsPt = theDQMstore->book1D("LamEffVsPt",
+  lamEffVsPt_num = theDQMstore->make<TH1D>("LamEffVsPt_num",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
+  lamEffVsEtaPt_num = theDQMstore->make<TH2D>("LamEffVsEtaPt_num",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
-  lamTkEffVsR = theDQMstore->book1D("LamTkEffVsR",
+  lamTkEffVsR_num = theDQMstore->make<TH1D>("LamTkEffVsR_num",
 			   "#Lambda^{0} TrackingEfficiency vs #rho", 40, 0., 40.);
-  lamTkEffVsEta = theDQMstore->book1D("LamTkEffVsEta",
+  lamTkEffVsEta_num = theDQMstore->make<TH1D>("LamTkEffVsEta_num",
 			     "#Lambda^{0} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
-  lamTkEffVsPt = theDQMstore->book1D("LamTkEffVsPt",
+  lamTkEffVsPt_num = theDQMstore->make<TH1D>("LamTkEffVsPt_num",
 			    "#Lambda^{0} Tracking Efficiency vs p_{T}", 70, 0., 20.);
+  lamTkEffVsEtaPt_num = theDQMstore->make<TH2D>("LamTkEffVsEtaPt_num",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
-  lamEffVsR_num = theDQMstore->book1D("LamEffVsR_num",
+  lamEffVsR_denom = theDQMstore->make<TH1D>("LamEffVsR_denom",
 			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
-  lamEffVsEta_num = theDQMstore->book1D("LamEffVsEta_num",
+  lamEffVsEta_denom = theDQMstore->make<TH1D>("LamEffVsEta_denom",
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
-  lamEffVsPt_num = theDQMstore->book1D("LamEffVsPt_num",
+  lamEffVsPt_denom = theDQMstore->make<TH1D>("LamEffVsPt_denom",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-  lamEffVsEtaPt_num = theDQMstore->book2D("LamEffVsEtaPt_num",
-                           "#Lambda^{0} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
+  lamEffVsEtaPt_denom = theDQMstore->make<TH2D>("LamEffVsEtaPt_denom",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
-  lamTkEffVsR_num = theDQMstore->book1D("LamTkEffVsR_num",
-			   "#Lambda^{0} TrackingEfficiency vs #rho", 40, 0., 40.);
-  lamTkEffVsEta_num = theDQMstore->book1D("LamTkEffVsEta_num",
-			     "#Lambda^{0} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
-  lamTkEffVsPt_num = theDQMstore->book1D("LamTkEffVsPt_num",
-			    "#Lambda^{0} Tracking Efficiency vs p_{T}", 70, 0., 20.);
-  lamTkEffVsEtaPt_num = theDQMstore->book2D("LamTkEffVsEtaPt_num",
-                           "#Lambda^{0} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
-
-  lamEffVsR_denom = theDQMstore->book1D("LamEffVsR_denom",
-			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
-  lamEffVsEta_denom = theDQMstore->book1D("LamEffVsEta_denom",
-			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
-  lamEffVsPt_denom = theDQMstore->book1D("LamEffVsPt_denom",
-			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-  lamEffVsEtaPt_denom = theDQMstore->book2D("LamEffVsEtaPt_denom",
-                           "#Lambda^{0} Efficiency vs #eta and p_{T}", 6, -2.4, 2.4, 20, 0., 10.);
-
-  ksFakeVsR = theDQMstore->book1D("K0sFakeVsR",
+  ksFakeVsR_num = theDQMstore->make<TH1D>("K0sFakeVsR_num",
 			   "K^{0}_{S} Fake Rate vs #rho", 40, 0., 40.);
-  ksFakeVsEta = theDQMstore->book1D("K0sFakeVsEta",
+  ksFakeVsEta_num = theDQMstore->make<TH1D>("K0sFakeVsEta_num",
 			     "K^{0}_{S} Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksFakeVsPt = theDQMstore->book1D("K0sFakeVsPt",
+  ksFakeVsPt_num = theDQMstore->make<TH1D>("K0sFakeVsPt_num",
 			    "K^{0}_{S} Fake Rate vs p_{T}", 70, 0., 20.);
-  ksTkFakeVsR = theDQMstore->book1D("K0sTkFakeVsR",
+  ksTkFakeVsR_num = theDQMstore->make<TH1D>("K0sTkFakeVsR_num",
 			   "K^{0}_{S} Tracking Fake Rate vs #rho", 40, 0., 40.);
-  ksTkFakeVsEta = theDQMstore->book1D("K0sTkFakeVsEta",
+  ksTkFakeVsEta_num = theDQMstore->make<TH1D>("K0sTkFakeVsEta_num",
 			     "K^{0}_{S} Tracking Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksTkFakeVsPt = theDQMstore->book1D("K0sTkFakeVsPt",
+  ksTkFakeVsPt_num = theDQMstore->make<TH1D>("K0sTkFakeVsPt_num",
 			    "K^{0}_{S} Tracking Fake Rate vs p_{T}", 70, 0., 20.);
 
-  ksFakeVsR_num = theDQMstore->book1D("K0sFakeVsR_num",
+  ksFakeVsR_denom = theDQMstore->make<TH1D>("K0sFakeVsR_denom",
 			   "K^{0}_{S} Fake Rate vs #rho", 40, 0., 40.);
-  ksFakeVsEta_num = theDQMstore->book1D("K0sFakeVsEta_num",
+  ksFakeVsEta_denom = theDQMstore->make<TH1D>("K0sFakeVsEta_denom",
 			     "K^{0}_{S} Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksFakeVsPt_num = theDQMstore->book1D("K0sFakeVsPt_num",
-			    "K^{0}_{S} Fake Rate vs p_{T}", 70, 0., 20.);
-  ksTkFakeVsR_num = theDQMstore->book1D("K0sTkFakeVsR_num",
-			   "K^{0}_{S} Tracking Fake Rate vs #rho", 40, 0., 40.);
-  ksTkFakeVsEta_num = theDQMstore->book1D("K0sTkFakeVsEta_num",
-			     "K^{0}_{S} Tracking Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksTkFakeVsPt_num = theDQMstore->book1D("K0sTkFakeVsPt_num",
-			    "K^{0}_{S} Tracking Fake Rate vs p_{T}", 70, 0., 20.);
-
-  ksFakeVsR_denom = theDQMstore->book1D("K0sFakeVsR_denom",
-			   "K^{0}_{S} Fake Rate vs #rho", 40, 0., 40.);
-  ksFakeVsEta_denom = theDQMstore->book1D("K0sFakeVsEta_denom",
-			     "K^{0}_{S} Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksFakeVsPt_denom = theDQMstore->book1D("K0sFakeVsPt_denom",
+  ksFakeVsPt_denom = theDQMstore->make<TH1D>("K0sFakeVsPt_denom",
 			    "K^{0}_{S} Fake Rate vs p_{T}", 70, 0., 20.);
 
-  lamFakeVsR = theDQMstore->book1D("LamFakeVsR",
+  lamFakeVsR_num = theDQMstore->make<TH1D>("LamFakeVsR_num",
 			    "#Lambda^{0} Fake Rate vs #rho", 40, 0., 40.);
-  lamFakeVsEta = theDQMstore->book1D("LamFakeVsEta",
+  lamFakeVsEta_num = theDQMstore->make<TH1D>("LamFakeVsEta_num",
 			      "#Lambda^{0} Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamFakeVsPt = theDQMstore->book1D("LamFakeVsPt",
+  lamFakeVsPt_num = theDQMstore->make<TH1D>("LamFakeVsPt_num",
 			     "#Lambda^{0} Fake Rate vs p_{T}", 70, 0., 20.);
-  lamTkFakeVsR = theDQMstore->book1D("LamTkFakeVsR",
+  lamTkFakeVsR_num = theDQMstore->make<TH1D>("LamTkFakeVsR_num",
 			    "#Lambda^{0} Tracking Fake Rate vs #rho", 40, 0., 40.);
-  lamTkFakeVsEta = theDQMstore->book1D("LamTkFakeVsEta",
+  lamTkFakeVsEta_num = theDQMstore->make<TH1D>("LamTkFakeVsEta_num",
 			      "#Lambda^{0} Tracking Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamTkFakeVsPt = theDQMstore->book1D("LamTkFakeVsPt",
+  lamTkFakeVsPt_num = theDQMstore->make<TH1D>("LamTkFakeVsPt_num",
 			     "#Lambda^{0} Tracking Fake Rate vs p_{T}", 70, 0., 20.);
 
-  lamFakeVsR_num = theDQMstore->book1D("LamFakeVsR_num",
+  lamFakeVsR_denom = theDQMstore->make<TH1D>("LamFakeVsR_denom",
 			    "#Lambda^{0} Fake Rate vs #rho", 40, 0., 40.);
-  lamFakeVsEta_num = theDQMstore->book1D("LamFakeVsEta_num",
+  lamFakeVsEta_denom = theDQMstore->make<TH1D>("LamFakeVsEta_denom",
 			      "#Lambda^{0} Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamFakeVsPt_num = theDQMstore->book1D("LamFakeVsPt_num",
-			     "#Lambda^{0} Fake Rate vs p_{T}", 70, 0., 20.);
-  lamTkFakeVsR_num = theDQMstore->book1D("LamTkFakeVsR_num",
-			    "#Lambda^{0} Tracking Fake Rate vs #rho", 40, 0., 40.);
-  lamTkFakeVsEta_num = theDQMstore->book1D("LamTkFakeVsEta_num",
-			      "#Lambda^{0} Tracking Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamTkFakeVsPt_num = theDQMstore->book1D("LamTkFakeVsPt_num",
-			     "#Lambda^{0} Tracking Fake Rate vs p_{T}", 70, 0., 20.);
-
-  lamFakeVsR_denom = theDQMstore->book1D("LamFakeVsR_denom",
-			    "#Lambda^{0} Fake Rate vs #rho", 40, 0., 40.);
-  lamFakeVsEta_denom = theDQMstore->book1D("LamFakeVsEta_denom",
-			      "#Lambda^{0} Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamFakeVsPt_denom = theDQMstore->book1D("LamFakeVsPt_denom",
+  lamFakeVsPt_denom = theDQMstore->make<TH1D>("LamFakeVsPt_denom",
 			     "#Lambda^{0} Fake Rate vs p_{T}", 70, 0., 20.);
 
-//  theDQMstore->cd();
-//  subDirName = dirName + "/Other";
-//  theDQMstore->setCurrentFolder(subDirName.c_str());
-
-  nKs = theDQMstore->book1D("nK0s",
+  nKs = theDQMstore->make<TH1D>("nK0s",
 		     "Number of K^{0}_{S} found per event", 60, 0., 60.);
-  nLam = theDQMstore->book1D("nLam",
+  nLam = theDQMstore->make<TH1D>("nLam",
 		      "Number of #Lambda^{0} found per event", 60, 0., 60.);
 
-  ksXResolution = theDQMstore->book1D("ksXResolution",
+  ksXResolution = theDQMstore->make<TH1D>("ksXResolution",
 			       "Resolution of V0 decay vertex X coordinate", 50, 0., 50.);
-  ksYResolution = theDQMstore->book1D("ksYResolution",
+  ksYResolution = theDQMstore->make<TH1D>("ksYResolution",
 			       "Resolution of V0 decay vertex Y coordinate", 50, 0., 50.);
-  ksZResolution = theDQMstore->book1D("ksZResolution",
+  ksZResolution = theDQMstore->make<TH1D>("ksZResolution",
 			       "Resolution of V0 decay vertex Z coordinate", 50, 0., 50.);
-  lamXResolution = theDQMstore->book1D("lamXResolution",
+  lamXResolution = theDQMstore->make<TH1D>("lamXResolution",
 				"Resolution of V0 decay vertex X coordinate", 50, 0., 50.);
-  lamYResolution = theDQMstore->book1D("lamYResolution",
+  lamYResolution = theDQMstore->make<TH1D>("lamYResolution",
 				"Resolution of V0 decay vertex Y coordinate", 50, 0., 50.);
-  lamZResolution = theDQMstore->book1D("lamZResolution",
+  lamZResolution = theDQMstore->make<TH1D>("lamZResolution",
 				"Resolution of V0 decay vertex Z coordinate", 50, 0., 50.);
-  ksAbsoluteDistResolution = theDQMstore->book1D("ksRResolution",
+  ksAbsoluteDistResolution = theDQMstore->make<TH1D>("ksRResolution",
 					  "Resolution of absolute distance from primary vertex to V0 vertex",
 					  100, 0., 50.);
-  lamAbsoluteDistResolution = theDQMstore->book1D("lamRResolution",
+  lamAbsoluteDistResolution = theDQMstore->make<TH1D>("lamRResolution",
 					   "Resolution of absolute distance from primary vertex to V0 vertex",
 					   100, 0., 50.);
 
-  ksCandStatus = theDQMstore->book1D("ksCandStatus",
+  ksCandStatus = theDQMstore->make<TH1D>("ksCandStatus",
 			  "Fake type by cand status",
 			  10, 0., 10.);
-  lamCandStatus = theDQMstore->book1D("ksCandStatus",
+  lamCandStatus = theDQMstore->make<TH1D>("ksCandStatus",
 			  "Fake type by cand status",
 			  10, 0., 10.);
 
-  double minKsMass = 0.49767 - 0.07;
-  double maxKsMass = 0.49767 + 0.07;
-  double minLamMass = 1.1156 - 0.05;
-  double maxLamMass = 1.1156 + 0.05;
-  int ksMassNbins = 100;
+  double minKsMass = 0.49767 - 0.2;
+  double maxKsMass = 0.49767 + 0.2;
+  double minLamMass = 1.1156 - 0.2;
+  double maxLamMass = 1.1156 + 0.2;
+  int ksMassNbins = 300;
   double ksMassXmin = minKsMass;
   double ksMassXmax = maxKsMass;
-  int lamMassNbins = 100;
+  int lamMassNbins = 300;
   double lamMassXmin = minLamMass;
   double lamMassXmax = maxLamMass;
 
-  fakeKsMass = theDQMstore->book1D("ksMassFake",
+  fakeKsMass = theDQMstore->make<TH1D>("ksMassFake",
 			     "Mass of fake K0S",
 			     ksMassNbins, minKsMass, maxKsMass);
-  goodKsMass = theDQMstore->book1D("ksMassGood",
+  goodKsMass = theDQMstore->make<TH1D>("ksMassGood",
 			     "Mass of good reco K0S",
 			     ksMassNbins, minKsMass, maxKsMass);
-  fakeLamMass = theDQMstore->book1D("lamMassFake",
+  fakeLamMass = theDQMstore->make<TH1D>("lamMassFake",
 			      "Mass of fake Lambda",
 			      lamMassNbins, minLamMass, maxLamMass);
-  goodLamMass = theDQMstore->book1D("lamMassGood",
+  goodLamMass = theDQMstore->make<TH1D>("lamMassGood",
 			      "Mass of good Lambda",
 			      lamMassNbins, minLamMass, maxLamMass);
-  fakeKsMassPt = theDQMstore->book2D("ksMassPtFake",
+  fakeKsMassPt = theDQMstore->make<TH2D>("ksMassPtFake",
                              "Mass vs p_{T} of fake K0S",
                              100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
-  goodKsMassPt = theDQMstore->book2D("ksMassPtGood",
+  goodKsMassPt = theDQMstore->make<TH2D>("ksMassPtGood",
                              "Mass vs p_{T} of good reco K0S",
                              100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
-  fakeLamMassPt = theDQMstore->book2D("lamMassPtFake",
+  fakeLamMassPt = theDQMstore->make<TH2D>("lamMassPtFake",
                               "Mass vs p_{T} of fake Lambda",
                               100, 0, 10.0, lamMassNbins, minLamMass, maxLamMass);
-  goodLamMassPt = theDQMstore->book2D("lamMassPtGood",
+  goodLamMassPt = theDQMstore->make<TH2D>("lamMassPtGood",
                               "Mass vs p_{T} of good Lambda",
                               100, 0, 10.0, lamMassNbins, minLamMass, maxLamMass);
 
-  ksMassAll = theDQMstore->book1D("ksMassAll",
+  ksMassAll = theDQMstore->make<TH1D>("ksMassAll",
 				  "Invariant mass of all K0S",
 				  ksMassNbins, ksMassXmin, ksMassXmax);
-  lamMassAll = theDQMstore->book1D("lamMassAll",
+  lamMassAll = theDQMstore->make<TH1D>("lamMassAll",
 				   "Invariant mass of all #Lambda^{0}",
 				   lamMassNbins, lamMassXmin, lamMassXmax);
-  ksMassPtAll = theDQMstore->book2D("ksMassPtAll",
+  ksMassPtAll = theDQMstore->make<TH2D>("ksMassPtAll",
                                   "Invariant mass vs p_{T} of all K0S", 
                                   100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
-  lamMassPtAll = theDQMstore->book2D("lamMassPtAll",
+  lamMassPtAll = theDQMstore->make<TH2D>("lamMassPtAll",
                                    "Invariant mass vs p_{T} of all #Lambda^{0}",
                                    100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
 
-  ksFakeDauRadDist = theDQMstore->book1D("radDistFakeKs",
+  ksFakeDauRadDist = theDQMstore->make<TH1D>("radDistFakeKs",
 				   "Production radius of daughter particle of Ks fake",
 				   100, 0., 15.);
-  lamFakeDauRadDist = theDQMstore->book1D("radDistFakeLam",
+  lamFakeDauRadDist = theDQMstore->make<TH1D>("radDistFakeLam",
 				    "Production radius of daughter particle of Lam fake",
 				    100, 0., 15.);
-
-  /*
-
-  ksEffVsRHist = new TH1F("K0sEffVsR", 
-			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
-  ksEffVsEtaHist = new TH1F("K0sEffVsEta",
-			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
-  ksEffVsPtHist = new TH1F("K0sEffVsPt",
-			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
-  ksFakeVsRHist = new TH1F("K0sFakeVsR",
-			   "K^{0}_{S} Fake Rate vs #rho", 40, 0., 40.);
-  ksFakeVsEtaHist = new TH1F("K0sFakeVsEta",
-			     "K^{0}_{S} Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksFakeVsPtHist = new TH1F("K0sFakeVsPt",
-			    "K^{0}_{S} Fake Rate vs p_{T}", 70, 0., 20.);
-
-  ksTkEffVsRHist = new TH1F("K0sTkEffVsR", 
-			  "K^{0}_{S} Tracking Efficiency vs #rho", 40, 0., 40.);
-  ksTkEffVsEtaHist = new TH1F("K0sTkEffVsEta",
-			    "K^{0}_{S} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
-  ksTkEffVsPtHist = new TH1F("K0sTkEffVsPt",
-			   "K^{0}_{S} Tracking Efficiency vs p_{T}", 70, 0., 20.);;
-  ksTkFakeVsRHist = new TH1F("K0sTkFakeVsR",
-			   "K^{0}_{S} Tracking Fake Rate vs #rho", 40, 0., 40.);
-  ksTkFakeVsEtaHist = new TH1F("K0sTkFakeVsEta",
-			     "K^{0}_{S} Tracking Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksTkFakeVsPtHist = new TH1F("K0sTkFakeVsPt",
-			    "K^{0}_{S} Tracking Fake Rate vs p_{T}", 70, 0., 20.);
-
-  ksEffVsRHist_denom = new TH1F("K0sEffVsR_denom", 
-			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
-  ksEffVsEtaHist_denom = new TH1F("K0sEffVsEta_denom",
-			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
-  ksEffVsPtHist_denom = new TH1F("K0sEffVsPt_denom",
-			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
-  ksFakeVsRHist_denom = new TH1F("K0sFakeVsR_denom",
-			   "K^{0}_{S} Fake Rate vs #rho", 40, 0., 40.);
-  ksFakeVsEtaHist_denom = new TH1F("K0sFakeVsEta_denom",
-			     "K^{0}_{S} Fake Rate vs #eta", 40, -2.5, 2.5);
-  ksFakeVsPtHist_denom = new TH1F("K0sFakeVsPt_denom",
-			    "K^{0}_{S} Fake Rate vs p_{T}", 70, 0., 20.);
-
-  lamEffVsRHist = new TH1F("LamEffVsR",
-			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
-  lamEffVsEtaHist = new TH1F("LamEffVsEta",
-			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
-  lamEffVsPtHist = new TH1F("LamEffVsPt",
-			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-  lamFakeVsRHist = new TH1F("LamFakeVsR",
-			    "#Lambda^{0} Fake Rate vs #rho", 40, 0., 40.);
-  lamFakeVsEtaHist = new TH1F("LamFakeVsEta",
-			      "#Lambda^{0} Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamFakeVsPtHist = new TH1F("LamFakeVsPt",
-			     "#Lambda^{0} Fake Rate vs p_{T}", 70, 0., 20.);
-
-  lamTkEffVsRHist = new TH1F("LamTkEffVsR",
-			   "#Lambda^{0} TrackingEfficiency vs #rho", 40, 0., 40.);
-  lamTkEffVsEtaHist = new TH1F("LamTkEffVsEta",
-			     "#Lambda^{0} Tracking Efficiency vs #eta", 40, -2.5, 2.5);
-  lamTkEffVsPtHist = new TH1F("LamTkEffVsPt",
-			    "#Lambda^{0} Tracking Efficiency vs p_{T}", 70, 0., 20.);
-  lamTkFakeVsRHist = new TH1F("LamTkFakeVsR",
-			    "#Lambda^{0} Tracking Fake Rate vs #rho", 40, 0., 40.);
-  lamTkFakeVsEtaHist = new TH1F("LamTkFakeVsEta",
-			      "#Lambda^{0} Tracking Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamTkFakeVsPtHist = new TH1F("LamTkFakeVsPt",
-			     "#Lambda^{0} Tracking Fake Rate vs p_{T}", 70, 0., 20.);
-
-  lamEffVsRHist_denom = new TH1F("LamEffVsR_denom",
-			   "#Lambda^{0} Efficiency vs #rho", 40, 0., 40.);
-  lamEffVsEtaHist_denom = new TH1F("LamEffVsEta_denom",
-			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
-  lamEffVsPtHist_denom = new TH1F("LamEffVsPt_denom",
-			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
-  lamFakeVsRHist_denom = new TH1F("LamFakeVsR_denom",
-			    "#Lambda^{0} Fake Rate vs #rho", 40, 0., 40.);
-  lamFakeVsEtaHist_denom = new TH1F("LamFakeVsEta_denom",
-			      "#Lambda^{0} Fake Rate vs #eta", 40, -2.5, 2.5);
-  lamFakeVsPtHist_denom = new TH1F("LamFakeVsPt_denom",
-			     "#Lambda^{0} Fake Rate vs p_{T}", 70, 0., 20.);
-
-  nKsHist = new TH1F("nK0s",
-		     "Number of K^{0}_{S} found per event", 60, 0., 60.);
-  nLamHist = new TH1F("nLam",
-		      "Number of #Lambda^{0} found per event", 60, 0., 60.);
-
-  ksXResolutionHist = new TH1F("ksXResolution",
-			       "Resolution of V0 decay vertex X coordinate", 50, 0., 50.);
-  ksYResolutionHist = new TH1F("ksYResolution",
-			       "Resolution of V0 decay vertex Y coordinate", 50, 0., 50.);
-  ksZResolutionHist = new TH1F("ksZResolution",
-			       "Resolution of V0 decay vertex Z coordinate", 50, 0., 50.);
-  lamXResolutionHist = new TH1F("lamXResolution",
-				"Resolution of V0 decay vertex X coordinate", 50, 0., 50.);
-  lamYResolutionHist = new TH1F("lamYResolution",
-				"Resolution of V0 decay vertex Y coordinate", 50, 0., 50.);
-  lamZResolutionHist = new TH1F("lamZResolution",
-				"Resolution of V0 decay vertex Z coordinate", 50, 0., 50.);
-  ksAbsoluteDistResolutionHist = new TH1F("ksRResolution",
-					  "Resolution of absolute distance from primary vertex to V0 vertex",
-					  100, 0., 50.);
-  lamAbsoluteDistResolutionHist = new TH1F("lamRResolution",
-					   "Resolution of absolute distance from primary vertex to V0 vertex",
-					   100, 0., 50.);
-
-  ksCandStatusHist = new TH1F("ksCandStatus",
-			  "Fake type by cand status",
-			  10, 0., 10.);
-  lamCandStatusHist = new TH1F("ksCandStatus",
-			  "Fake type by cand status",
-			  10, 0., 10.);
-
-  double minKsMass = 0.49767 - 0.07;
-  double maxKsMass = 0.49767 + 0.07;
-  double minLamMass = 1.1156 - 0.05;
-  double maxLamMass = 1.1156 + 0.05;
-  fakeKsMassHisto = new TH1F("ksMassFake",
-			     "Mass of fake K0s",
-			     100, minKsMass, maxKsMass);
-  goodKsMassHisto = new TH1F("ksMassGood",
-			     "Mass of good reco K0s",
-			     100, minKsMass, maxKsMass);
-  fakeLamMassHisto = new TH1F("lamMassFake",
-			      "Mass of fake Lambda",
-			      100, minLamMass, maxLamMass);
-  goodLamMassHisto = new TH1F("lamMassGood",
-			      "Mass of good Lambda",
-			      100, minLamMass, maxLamMass);
-
-  ksFakeDauRadDistHisto = new TH1F("radDistFakeKs",
-				   "Production radius of daughter particle of Ks fake",
-				   100, 0., 15.);
-  lamFakeDauRadDistHisto = new TH1F("radDistFakeLam",
-				    "Production radius of daughter particle of Lam fake",
-				    100, 0., 15.);*/
-
-
-  //std::cout << "Histograms booked" << std::endl;
-
-  /*ksEffVsRHist->Sumw2();
-  ksEffVsEtaHist->Sumw2();
-  ksEffVsPtHist->Sumw2();
-  ksTkEffVsRHist->Sumw2();
-  ksTkEffVsEtaHist->Sumw2();
-  ksTkEffVsPtHist->Sumw2();
-  ksFakeVsRHist->Sumw2();
-  ksFakeVsEtaHist->Sumw2();
-  ksFakeVsPtHist->Sumw2();
-  ksTkFakeVsRHist->Sumw2();
-  ksTkFakeVsEtaHist->Sumw2();
-  ksTkFakeVsPtHist->Sumw2();
-
-  lamEffVsRHist->Sumw2();
-  lamEffVsEtaHist->Sumw2();
-  lamEffVsPtHist->Sumw2();
-  lamTkEffVsRHist->Sumw2();
-  lamTkEffVsEtaHist->Sumw2();
-  lamTkEffVsPtHist->Sumw2();
-  lamFakeVsRHist->Sumw2();
-  lamFakeVsEtaHist->Sumw2();
-  lamFakeVsPtHist->Sumw2();
-  lamTkFakeVsRHist->Sumw2();
-  lamTkFakeVsEtaHist->Sumw2();
-  lamTkFakeVsPtHist->Sumw2();*/
-
 }
 
 void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -469,7 +257,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   using namespace std;
   using namespace reco;
 
-  //cout << "In analyze(), getting collections..." << endl;
   // Get event setup info, B-field and tracker geometry
 //  ESHandle<MagneticField> bFieldHandle;
 //  iSetup.get<IdealMagneticFieldRecord>().get(bFieldHandle);
@@ -623,15 +410,10 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      if( k0sVtx.isNonnull() ) {
 		if( k0sVtx->position() == parentVertex->position() ) {
 		  if( parentVertex->nDaughterTracks() == 2 ) {
-		    if( parentVertex->nSourceTracks() == 0 ) {
-		      // No source tracks found for K0s vertex; shouldn't happen, but does for evtGen events
-		      K0sCandStatus = 6;
-		    }
-		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
-			 iTP != parentVertex->sourceTracks_end(); iTP++) {
-		      if( (*iTP)->pdgId() == 310 ) {
-//                      if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 )
-//                      {
+		    if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
+//		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
+//			 iTP != parentVertex->sourceTracks_end(); iTP++) {
+//		      if( fabs((*iTP)->pdgId()) == 310 ) {
 			K0sCandStatus = 1;
 			realK0sFound++;
 			numK0sFound += 1.;
@@ -640,15 +422,13 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			trueK0s.push_back(pair);
 			trueKsMasses.push_back(mass);
                         trueKsPt.push_back(K0sCandpT);
-		      }
-		      else {
+		    }
+		    else {
 			K0sCandStatus = 2;
-//                        if( (fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) )
-//                        {
-			if( (*iTP)->pdgId() == 3122 ) {
+//			if( fabs((*iTP)->pdgId()) == 3122 ) {
+                        if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212)) {
 			  K0sCandStatus = 7;
 			}
-		      }
 		    }
 		  }
 		  else {
@@ -760,15 +540,10 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      if( LamVtx.isNonnull() ) {
 		if( LamVtx->position() == parentVertex->position() ) {
 		  if( parentVertex->nDaughterTracks() == 2 ) {
-		    if( parentVertex->nSourceTracks() == 0 ) {
-		      // No source tracks found for K0s vertex; shouldn't happen, but does for evtGen events
-		      LamCandStatus = 6;
-		    }
-		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
-			 iTP != parentVertex->sourceTracks_end(); ++iTP) {
-		      if( abs((*iTP)->pdgId()) == 3122 ) {
-//                      if( (fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) ) 
-//                      {
+		    if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) ) {
+//		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
+//			 iTP != parentVertex->sourceTracks_end(); ++iTP) {
+//		      if( fabs((*iTP)->pdgId()) == 3122 ) {
 			LamCandStatus = 1;
 			realLamFound++;
 			numLamFound += 1.;
@@ -777,16 +552,14 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			trueLams.push_back(pair);
 			trueLamMasses.push_back(mass);
                         trueLamPt.push_back(LamCandpT);
-		      }
-		      else {
+		    }
+		    else {
 			LamCandStatus = 2;
-			if( abs((*iTP)->pdgId() ) == 310 ) {
-//                        if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 )
-//                        {
+//			if( fabs((*iTP)->pdgId() ) == 310 ) {
+                        if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
 			  LamCandStatus = 7;
 			}
-		      }
-		    }
+	            }
 		  }
 		  else {
 		    // Found a bad match because the mother has too many daughters
@@ -852,7 +625,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     TrackingParticle* itp1 = const_cast<TrackingParticle*>(tpr1.get());
     if( (itp1->pdgId() == 211 || itp1->pdgId() == 2212)
 	&& itp1->parentVertex().isNonnull()
-	&& abs(itp1->momentum().eta()) < 2.4
+	&& fabs(itp1->momentum().eta()) < 2.4
 	&& sqrt( itp1->momentum().perp2() ) > 0.2) {
       bool isLambda = false;
       if( itp1->pdgId() == 2212 ) isLambda = true;
@@ -861,7 +634,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	TrackingVertexRef piCand1Vertex = itp1->parentVertex();
 	for(TrackingVertex::tp_iterator iTP1 = piCand1Vertex->sourceTracks_begin();
 	    iTP1 != piCand1Vertex->sourceTracks_end(); iTP1++) {
-	  if( abs((*iTP1)->pdgId()) == 3122 ) {
+	  if( fabs((*iTP1)->pdgId()) == 3122 ) {
 	    for(TrackingParticleCollection::size_type j=0;
 		j < tPCeff.size();
 		j++)
@@ -873,7 +646,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      else particle2pdgId = -2212;
 	      if( itp2->pdgId() == particle2pdgId
 		  && itp2->parentVertex().isNonnull()
-		  && abs(itp2->momentum().eta()) < 2.4
+		  && fabs(itp2->momentum().eta()) < 2.4
 		  && sqrt(itp2->momentum().perp2()) > 0.2) {
 		if(itp2->parentVertex() == itp1->parentVertex()) {
 		  // Found a good pair of Lambda daughters
@@ -888,7 +661,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			ifill++) {
 		      // do nothing?
 		    }
-		    if( abs((*iTP2)->pdgId()) == 3122 ) {
+		    if( fabs((*iTP2)->pdgId()) == 3122 ) {
 		      // found generated Lambda
 		      
 		      LamGenpT = sqrt((*iTP2)->momentum().perp2());
@@ -969,7 +742,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			}
 			lamEffVsR_denom->Fill(LamGenR);
 		      }
-		      if(abs(LamGenEta) > 0. && LamGenpT > 0.) {
+		      if(fabs(LamGenEta) > 0. && LamGenpT > 0.) {
 			if(LamGenStatus == 1) {
 			  lamEffVsEta_num->Fill(LamGenEta);
                           lamEffVsPt_num->Fill(LamGenpT);
@@ -1004,7 +777,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     // only count the efficiency for pions with |eta|<2.4 and pT>0.2 GeV. First search for a suitable pi+
     if ( itp1->pdgId() == 211 
 	 && itp1->parentVertex().isNonnull() 
-	 && abs(itp1->momentum().eta()) < 2.4 
+	 && fabs(itp1->momentum().eta()) < 2.4 
 	 && sqrt(itp1->momentum().perp2()) > 0.2) {
       if ( itp1->parentVertex()->nDaughterTracks() == 2 ) {
 	TrackingVertexRef piCand1Vertex = itp1->parentVertex();	       
@@ -1019,7 +792,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      TrackingParticle* itp2=const_cast<TrackingParticle*>(tpr2.get());
 	      
 	      if ( itp2->pdgId() == -211 && itp2->parentVertex().isNonnull()  
-		   && abs(itp2->momentum().eta()) < 2.4 
+		   && fabs(itp2->momentum().eta()) < 2.4 
 		   && sqrt(itp2->momentum().perp2()) > 0.2) {
 		//check the pi+ and pi- have the same vertex
 		if ( itp2->parentVertex() == itp1->parentVertex() ) {
@@ -1116,7 +889,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			}
 			ksEffVsR_denom->Fill(K0sGenR);
 		      }
-		      if(abs(K0sGenEta) > 0. && K0sGenpT > 0.) {
+		      if(fabs(K0sGenEta) > 0. && K0sGenpT > 0.) {
 			if(K0sGenStatus == 1) {
 			  ksEffVsEta_num->Fill(K0sGenEta);
                           ksEffVsPt_num->Fill(K0sGenpT);
@@ -1144,139 +917,9 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   delete thePrimary;
 }
 
-void V0Validator::endRun(const edm::Run& iRun, const edm::EventSetup& iSetup) {
-  //theDQMstore->showDirStructure();
-  if(theDQMRootFileName.size() && theDQMstore) {
-    theDQMstore->save(theDQMRootFileName);
-  }
-}
+void V0Validator::endRun(const edm::Run& iRun, const edm::EventSetup& iSetup) {}
 
-
-//void V0Validator::endJob() {
-  //std::cout << "In endJob()" << std::endl;
-  /*ksEffVsRHist->Divide(ksEffVsRHist_denom);
-  ksEffVsEtaHist->Divide(ksEffVsEtaHist_denom);
-  ksEffVsPtHist->Divide(ksEffVsPtHist_denom);
-  ksTkEffVsRHist->Divide(ksEffVsRHist_denom);
-  ksTkEffVsEtaHist->Divide(ksEffVsEtaHist_denom);
-  ksTkEffVsPtHist->Divide(ksEffVsPtHist_denom);
-  ksFakeVsRHist->Divide(ksFakeVsRHist_denom);
-  ksFakeVsEtaHist->Divide(ksFakeVsEtaHist_denom);
-  ksFakeVsPtHist->Divide(ksFakeVsPtHist_denom);
-  ksTkFakeVsRHist->Divide(ksFakeVsRHist_denom);
-  ksTkFakeVsEtaHist->Divide(ksFakeVsEtaHist_denom);
-  ksTkFakeVsPtHist->Divide(ksFakeVsPtHist_denom);
-
-  lamEffVsRHist->Divide(lamEffVsRHist_denom);
-  lamEffVsEtaHist->Divide(lamEffVsEtaHist_denom);
-  lamEffVsPtHist->Divide(lamEffVsPtHist_denom);
-  lamTkEffVsRHist->Divide(lamEffVsRHist_denom);
-  lamTkEffVsEtaHist->Divide(lamEffVsEtaHist_denom);
-  lamTkEffVsPtHist->Divide(lamEffVsPtHist_denom);
-  lamFakeVsRHist->Divide(lamFakeVsRHist_denom);
-  lamFakeVsEtaHist->Divide(lamFakeVsEtaHist_denom);
-  lamFakeVsPtHist->Divide(lamFakeVsPtHist_denom);
-  lamTkFakeVsRHist->Divide(lamFakeVsRHist_denom);
-  lamTkFakeVsEtaHist->Divide(lamFakeVsEtaHist_denom);
-  lamTkFakeVsPtHist->Divide(lamFakeVsPtHist_denom);
-
-  theDQMstore->cd();
-  std::string subDirName = dirName + "/Efficiency";
-  theDQMstore->setCurrentFolder(subDirName.c_str());
-
-  ksEffVsR = theDQMstore->book1D("KsEffVsR", ksEffVsRHist);
-  ksEffVsEta = theDQMstore->book1D("KsEffVsEta", ksEffVsEtaHist);
-  ksEffVsPt = theDQMstore->book1D("KsEffVsPt", ksEffVsPtHist);
-  ksTkEffVsR = theDQMstore->book1D("KsTkEffVsR", ksTkEffVsRHist);
-  ksTkEffVsEta = theDQMstore->book1D("KsTkEffVsEta", ksTkEffVsEtaHist);
-  ksTkEffVsPt = theDQMstore->book1D("KsTkEffVsPt", ksTkEffVsPtHist);
-
-  lamEffVsR = theDQMstore->book1D("LamEffVsR", lamEffVsRHist);
-  lamEffVsEta = theDQMstore->book1D("LamEffVsEta", lamEffVsEtaHist);
-  lamEffVsPt = theDQMstore->book1D("LamEffVsPt", lamEffVsPtHist);
-  lamTkEffVsR = theDQMstore->book1D("LamTkEffVsR", lamTkEffVsRHist);
-  lamTkEffVsEta = theDQMstore->book1D("LamTkEffVsEta", lamTkEffVsEtaHist);
-  lamTkEffVsPt = theDQMstore->book1D("LamTkEffVsPt", lamTkEffVsPtHist);
-
-  theDQMstore->cd();
-  subDirName = dirName + "/Fake";
-  theDQMstore->setCurrentFolder(subDirName.c_str());
-
-  ksFakeVsR = theDQMstore->book1D("KsFakeVsR", ksFakeVsRHist);
-  ksFakeVsEta = theDQMstore->book1D("KsFakeVsEta", ksFakeVsEtaHist);
-  ksFakeVsPt = theDQMstore->book1D("KsFakeVsPt", ksFakeVsPtHist);
-  ksTkFakeVsR = theDQMstore->book1D("KsTkFakeVsR", ksTkFakeVsRHist);
-  ksTkFakeVsEta = theDQMstore->book1D("KsTkFakeVsEta", ksTkFakeVsEtaHist);
-  ksTkFakeVsPt = theDQMstore->book1D("KsTkFakeVsPt", ksTkFakeVsPtHist);
-
-  lamFakeVsR = theDQMstore->book1D("LamFakeVsR", lamFakeVsRHist);
-  lamFakeVsEta = theDQMstore->book1D("LamFakeVsEta", lamFakeVsEtaHist);
-  lamFakeVsPt = theDQMstore->book1D("LamFakeVsPt", lamFakeVsPtHist);
-  lamTkFakeVsR = theDQMstore->book1D("LamTkFakeVsR", lamTkFakeVsRHist);
-  lamTkFakeVsEta = theDQMstore->book1D("LamTkFakeVsEta", lamTkFakeVsEtaHist);
-  lamTkFakeVsPt = theDQMstore->book1D("LamTkFakeVsPt", lamTkFakeVsPtHist);
-
-  nKs = theDQMstore->book1D("nK0s", nKsHist);
-  nLam = theDQMstore->book1D("nLam", nLamHist);
-
-  ksCandStatusME = theDQMstore->book1D("ksCandStatus", ksCandStatusHist);
-  lamCandStatusME = theDQMstore->book1D("lamCandStatus", lamCandStatusHist);
-
-  fakeKsMass = theDQMstore->book1D("ksMassFake", fakeKsMassHisto);
-  goodKsMass = theDQMstore->book1D("ksMassGood", goodKsMassHisto);
-  fakeLamMass = theDQMstore->book1D("lamMassFake", fakeLamMassHisto);
-  goodLamMass = theDQMstore->book1D("lamMassGood", goodLamMassHisto);
-
-  ksFakeDauRadDist = theDQMstore->book1D("radDistFakeKs", ksFakeDauRadDistHisto);
-  lamFakeDauRadDist = theDQMstore->book1D("radDistFakeLam", lamFakeDauRadDistHisto);
-
-  // ***************************************/
-  /*theDQMstore->tag(ksEffVsR->getFullname(), 1);
-  theDQMstore->tag(ksEffVsEta->getFullname(), 2);
-  theDQMstore->tag(ksEffVsPt->getFullname(), 3);
-  theDQMstore->tag(ksTkEffVsR->getFullname(), 4);
-  theDQMstore->tag(ksTkEffVsEta->getFullname(), 5);
-  theDQMstore->tag(ksTkEffVsPt->getFullname(), 6);
-
-  theDQMstore->tag(lamEffVsR->getFullname(), 7);
-  theDQMstore->tag(lamEffVsEta->getFullname(), 8);
-  theDQMstore->tag(lamEffVsPt->getFullname(), 9);
-  theDQMstore->tag(lamTkEffVsR->getFullname(), 10);
-  theDQMstore->tag(lamTkEffVsEta->getFullname(), 11);
-  theDQMstore->tag(lamTkEffVsPt->getFullname(), 12);
-
-  theDQMstore->tag(ksFakeVsR->getFullname(), 13);
-  theDQMstore->tag(ksFakeVsEta->getFullname(), 14);
-  theDQMstore->tag(ksFakeVsPt->getFullname(), 15);
-  theDQMstore->tag(ksTkFakeVsR->getFullname(), 16);
-  theDQMstore->tag(ksTkFakeVsEta->getFullname(), 17);
-  theDQMstore->tag(ksTkFakeVsPt->getFullname(), 18);
-
-  theDQMstore->tag(lamFakeVsR->getFullname(), 19);
-  theDQMstore->tag(lamFakeVsEta->getFullname(), 20);
-  theDQMstore->tag(lamFakeVsPt->getFullname(), 21);
-  theDQMstore->tag(lamTkFakeVsR->getFullname(), 22);
-  theDQMstore->tag(lamTkFakeVsEta->getFullname(), 23);
-  theDQMstore->tag(lamTkFakeVsPt->getFullname(), 24);
-
-  theDQMstore->tag(nKs->getFullname(), 25);
-  theDQMstore->tag(nLam->getFullname(), 26);
-  
-  theDQMstore->tag(ksCandStatusME->getFullname(), 27);
-  theDQMstore->tag(lamCandStatusME->getFullname(), 28);
-
-  theDQMstore->tag(fakeKsMass->getFullname(), 29);
-  theDQMstore->tag(goodKsMass->getFullname(), 30);
-  theDQMstore->tag(fakeLamMass->getFullname(), 31);
-  theDQMstore->tag(goodLamMass->getFullname(), 32);
-
-  theDQMstore->tag(ksFakeDauRadDist->getFullname(), 33);
-  theDQMstore->tag(lamFakeDauRadDist->getFullname(), 34);*/
-  /****************************************/
-
-  /*theDQMstore->showDirStructure();
-    theDQMstore->save(theDQMRootFileName);*/
-//}
+//void V0Validator::endJob() {}
 
 //define this as a plug-in
 //DEFINE_FWK_MODULE(V0Validator);

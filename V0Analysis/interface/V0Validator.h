@@ -31,9 +31,6 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
-
-#include "DQMServices/Core/interface/DQMStore.h"
-#include "DQMServices/Core/interface/MonitorElement.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 
 #include "DataFormats/TrackReco/interface/Track.h"
@@ -110,186 +107,101 @@ private:
   int genLam, genK0s, realLamFound, realK0sFound, realLamFoundEff, realK0sFoundEff;
   int lamTracksFound, k0sTracksFound, lamCandFound, k0sCandFound, noTPforK0sCand, noTPforLamCand;
 
-  //Temporary histograms so that we can divide them for efficiencies.
-  //  They are turned into MonitorElements in endJob()
-  /*  TH1F* ksEffVsRHist;
-  TH1F* ksEffVsEtaHist;
-  TH1F* ksEffVsPtHist;
-  TH1F* ksTkEffVsRHist;
-  TH1F* ksTkEffVsEtaHist;
-  TH1F* ksTkEffVsPtHist;
-  TH1F* ksFakeVsRHist;
-  TH1F* ksFakeVsEtaHist;
-  TH1F* ksFakeVsPtHist;
-  TH1F* ksTkFakeVsRHist;
-  TH1F* ksTkFakeVsEtaHist;
-  TH1F* ksTkFakeVsPtHist;
+  std::vector<double> etaBins, ptBins;
 
-  TH1F* ksEffVsRHist_denom;
-  TH1F* ksEffVsEtaHist_denom;
-  TH1F* ksEffVsPtHist_denom;
-  TH1F* ksFakeVsRHist_denom;
-  TH1F* ksFakeVsEtaHist_denom;
-  TH1F* ksFakeVsPtHist_denom;
+  edm::Service<TFileService> theDQMstore;
 
-  TH1F* ksXResolutionHist;
-  TH1F* ksYResolutionHist;
-  TH1F* ksZResolutionHist;
-  TH1F* ksAbsoluteDistResolutionHist;
-  TH1F* lamXResolutionHist;
-  TH1F* lamYResolutionHist;
-  TH1F* lamZResolutionHist;
-  TH1F* lamAbsoluteDistResolutionHist;
+  // kshort eff numerator
+  TH1D* ksEffVsR_num;
+  TH1D* ksEffVsEta_num;
+  TH1D* ksEffVsPt_num;
+  TH2D* ksEffVsEtaPt_num;
+  TH1D* ksTkEffVsR_num;
+  TH1D* ksTkEffVsEta_num;
+  TH1D* ksTkEffVsPt_num;
+  TH2D* ksTkEffVsEtaPt_num;
 
-  TH1F* lamEffVsRHist;
-  TH1F* lamEffVsEtaHist;
-  TH1F* lamEffVsPtHist;
-  TH1F* lamTkEffVsRHist;
-  TH1F* lamTkEffVsEtaHist;
-  TH1F* lamTkEffVsPtHist;
-  TH1F* lamFakeVsRHist;
-  TH1F* lamFakeVsEtaHist;
-  TH1F* lamFakeVsPtHist;
-  TH1F* lamTkFakeVsRHist;
-  TH1F* lamTkFakeVsEtaHist;
-  TH1F* lamTkFakeVsPtHist;
+  // kshort fake numerator
+  TH1D* ksFakeVsR_num;
+  TH1D* ksFakeVsEta_num;
+  TH1D* ksFakeVsPt_num;
+  TH2D* ksFakeVsEtaPt_num;
+  TH1D* ksTkFakeVsR_num;
+  TH1D* ksTkFakeVsEta_num;
+  TH1D* ksTkFakeVsPt_num;
+  TH2D* ksTkFakeVsEtaPt_num;
 
-  TH1F* lamEffVsRHist_denom;
-  TH1F* lamEffVsEtaHist_denom;
-  TH1F* lamEffVsPtHist_denom;
-  TH1F* lamFakeVsRHist_denom;
-  TH1F* lamFakeVsEtaHist_denom;
-  TH1F* lamFakeVsPtHist_denom;
+  // kshort fake and eff denominator 
+  TH1D* ksFakeVsR_denom;
+  TH1D* ksFakeVsEta_denom;
+  TH1D* ksFakeVsPt_denom;
+  TH2D* ksFakeVsEtaPt_denom;
+  TH1D* ksEffVsR_denom;
+  TH1D* ksEffVsEta_denom;
+  TH1D* ksEffVsPt_denom;
+  TH2D* ksEffVsEtaPt_denom;
 
-  TH1F* nKsHist;
-  TH1F* nLamHist;
+  // lambda fake and eff denominator 
+  TH1D* lamFakeVsR_denom;
+  TH1D* lamFakeVsEta_denom;
+  TH1D* lamFakeVsPt_denom;
+  TH2D* lamFakeVsEtaPt_denom;
+  TH1D* lamEffVsR_denom;
+  TH1D* lamEffVsEta_denom;
+  TH1D* lamEffVsPt_denom;
+  TH2D* lamEffVsEtaPt_denom;
 
-  TH1F* lamCandStatusHist;
-  TH1F* ksCandStatusHist;
+  // lambda eff numerator
+  TH1D* lamEffVsR_num;
+  TH1D* lamEffVsEta_num;
+  TH1D* lamEffVsPt_num;
+  TH2D* lamEffVsEtaPt_num;
+  TH1D* lamTkEffVsR_num;
+  TH1D* lamTkEffVsEta_num;
+  TH1D* lamTkEffVsPt_num;
+  TH2D* lamTkEffVsEtaPt_num;
 
-  TH1F* fakeKsMassHisto;
-  TH1F* goodKsMassHisto;
-  TH1F* fakeLamMassHisto;
-  TH1F* goodLamMassHisto;
+  // lambda fake numerator
+  TH1D* lamFakeVsR_num;
+  TH1D* lamFakeVsEta_num;
+  TH1D* lamFakeVsPt_num;
+  TH2D* lamFakeVsEtaPt_num;
+  TH1D* lamTkFakeVsR_num;
+  TH1D* lamTkFakeVsEta_num;
+  TH1D* lamTkFakeVsPt_num;
+  TH2D* lamTkFakeVsEtaPt_num;
 
-  TH1F* ksFakeDauRadDistHisto;
-  TH1F* lamFakeDauRadDistHisto;*/
+  TH1D* ksXResolution;
+  TH1D* ksYResolution;
+  TH1D* ksZResolution;
+  TH1D* ksAbsoluteDistResolution;
+  TH1D* lamXResolution;
+  TH1D* lamYResolution;
+  TH1D* lamZResolution;
+  TH1D* lamAbsoluteDistResolution;
 
-  // DQMStore and MonitorElements for final histograms
-  DQMStore* theDQMstore;
+  TH1D* nKs;
+  TH1D* nLam;
 
-  MonitorElement* ksEffVsR;
-  MonitorElement* ksEffVsEta;
-  MonitorElement* ksEffVsPt;
-  MonitorElement* ksTkEffVsR;
-  MonitorElement* ksTkEffVsEta;
-  MonitorElement* ksTkEffVsPt;
-  MonitorElement* ksFakeVsR;
-  MonitorElement* ksFakeVsEta;
-  MonitorElement* ksFakeVsPt;
-  MonitorElement* ksTkFakeVsR;
-  MonitorElement* ksTkFakeVsEta;
-  MonitorElement* ksTkFakeVsPt;
+  TH1D* ksCandStatus;
+  TH1D* lamCandStatus;
 
-  MonitorElement* ksEffVsR_num;
-  MonitorElement* ksEffVsEta_num;
-  MonitorElement* ksEffVsPt_num;
-  MonitorElement* ksEffVsEtaPt_num;
-  MonitorElement* ksTkEffVsR_num;
-  MonitorElement* ksTkEffVsEta_num;
-  MonitorElement* ksTkEffVsPt_num;
-  MonitorElement* ksTkEffVsEtaPt_num;
-  MonitorElement* ksFakeVsR_num;
-  MonitorElement* ksFakeVsEta_num;
-  MonitorElement* ksFakeVsPt_num;
-  MonitorElement* ksFakeVsEtaPt_num;
-  MonitorElement* ksTkFakeVsR_num;
-  MonitorElement* ksTkFakeVsEta_num;
-  MonitorElement* ksTkFakeVsPt_num;
-  MonitorElement* ksTkFakeVsEtaPt_num;
+  TH1D* fakeKsMass;
+  TH1D* goodKsMass;
+  TH1D* fakeLamMass;
+  TH1D* goodLamMass;
+  TH2D* fakeKsMassPt;
+  TH2D* goodKsMassPt;
+  TH2D* fakeLamMassPt;
+  TH2D* goodLamMassPt;
+  TH1D* ksMassAll;
+  TH1D* lamMassAll;
+  TH2D* ksMassPtAll;
+  TH2D* lamMassPtAll;
 
-  MonitorElement* ksFakeVsR_denom;
-  MonitorElement* ksFakeVsEta_denom;
-  MonitorElement* ksFakeVsPt_denom;
-  MonitorElement* ksFakeVsEtaPt_denom;
-  MonitorElement* ksEffVsR_denom;
-  MonitorElement* ksEffVsEta_denom;
-  MonitorElement* ksEffVsPt_denom;
-  MonitorElement* ksEffVsEtaPt_denom;
+  TH1D* ksFakeDauRadDist;
+  TH1D* lamFakeDauRadDist;
 
-  MonitorElement* lamFakeVsR_denom;
-  MonitorElement* lamFakeVsEta_denom;
-  MonitorElement* lamFakeVsPt_denom;
-  MonitorElement* lamEffVsR_denom;
-  MonitorElement* lamEffVsEta_denom;
-  MonitorElement* lamEffVsPt_denom;
-  MonitorElement* lamEffVsEtaPt_denom;
-
-  MonitorElement* lamEffVsR;
-  MonitorElement* lamEffVsEta;
-  MonitorElement* lamEffVsPt;
-  MonitorElement* lamTkEffVsR;
-  MonitorElement* lamTkEffVsEta;
-  MonitorElement* lamTkEffVsPt;
-  MonitorElement* lamFakeVsR;
-  MonitorElement* lamFakeVsEta;
-  MonitorElement* lamFakeVsPt;
-  MonitorElement* lamTkFakeVsR;
-  MonitorElement* lamTkFakeVsEta;
-  MonitorElement* lamTkFakeVsPt;
-
-  MonitorElement* lamEffVsR_num;
-  MonitorElement* lamEffVsEta_num;
-  MonitorElement* lamEffVsPt_num;
-  MonitorElement* lamEffVsEtaPt_num;
-  MonitorElement* lamTkEffVsR_num;
-  MonitorElement* lamTkEffVsEta_num;
-  MonitorElement* lamTkEffVsPt_num;
-  MonitorElement* lamTkEffVsEtaPt_num;
-  MonitorElement* lamFakeVsR_num;
-  MonitorElement* lamFakeVsEta_num;
-  MonitorElement* lamFakeVsPt_num;
-  MonitorElement* lamFakeVsEtaPt_num;
-  MonitorElement* lamTkFakeVsR_num;
-  MonitorElement* lamTkFakeVsEta_num;
-  MonitorElement* lamTkFakeVsPt_num;
-  MonitorElement* lamTkFakeVsEtaPt_num;
-
-  MonitorElement* ksXResolution;
-  MonitorElement* ksYResolution;
-  MonitorElement* ksZResolution;
-  MonitorElement* ksAbsoluteDistResolution;
-  MonitorElement* lamXResolution;
-  MonitorElement* lamYResolution;
-  MonitorElement* lamZResolution;
-  MonitorElement* lamAbsoluteDistResolution;
-
-  MonitorElement* nKs;
-  MonitorElement* nLam;
-
-  MonitorElement* ksCandStatus;
-  MonitorElement* lamCandStatus;
-
-  MonitorElement* fakeKsMass;
-  MonitorElement* goodKsMass;
-  MonitorElement* fakeLamMass;
-  MonitorElement* goodLamMass;
-  MonitorElement* fakeKsMassPt;
-  MonitorElement* goodKsMassPt;
-  MonitorElement* fakeLamMassPt;
-  MonitorElement* goodLamMassPt;
-
-  MonitorElement* ksMassAll;
-  MonitorElement* lamMassAll;
-  MonitorElement* ksMassPtAll;
-  MonitorElement* lamMassPtAll;
-
-  MonitorElement* ksFakeDauRadDist;
-  MonitorElement* lamFakeDauRadDist;
-
-
-  std::string theDQMRootFileName;
   edm::InputTag k0sCollectionTag;
   edm::InputTag lamCollectionTag;
-  std::string dirName;
 };
