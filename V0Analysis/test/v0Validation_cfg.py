@@ -30,6 +30,7 @@ process.source = cms.Source("PoolSource",
 
 ### validation-specific includes
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
+process.load("SimTracker.TrackAssociation.TrackAssociatorByChi2_cfi")
 process.load("RiceHIG.V0Analysis.v0selector_cff")
 process.load("RiceHIG.V0Analysis.v0validator_cff")
 
@@ -46,6 +47,7 @@ process.generalV0CandidatesNew = process.generalV0Candidates.clone (
 
 process.v0Validator.kShortCollection = cms.InputTag('selectV0CandidatesNewkshort:Kshort')
 process.v0Validator.lambdaCollection = cms.InputTag('selectV0CandidatesNewlambda:Lambda')
+process.v0Validator.isMatchByHitsOrChi2 = cms.bool(False)
 
 process.selectV0CandidatesNewlambda.v0CollName = cms.string("generalV0CandidatesNew")
 process.selectV0CandidatesNewkshort.v0CollName = cms.string("generalV0CandidatesNew")
@@ -58,7 +60,8 @@ process.options = cms.untracked.PSet(
 process.TFileService = cms.Service("TFileService",
                                    fileName = cms.string('v0validation.root')
                                    )
-process.TrackAssociatorByHits.Cut_RecoToSim = cms.double(0.6)
+process.TrackAssociatorByHits.Cut_RecoToSim = cms.double(0.5)
+process.TrackAssociatorByChi2ESProducer.chi2cut = cms.double(25.0)
 
 process.v0validation = cms.Sequence(process.generalV0CandidatesNew*process.selectV0CandidatesNewlambda*process.selectV0CandidatesNewkshort*process.v0Validator)
 

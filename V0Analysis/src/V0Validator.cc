@@ -33,7 +33,8 @@ const double protonMassSquared = protonMass*protonMass;
 
 V0Validator::V0Validator(const edm::ParameterSet& iConfig) : 
   k0sCollectionTag(iConfig.getParameter<edm::InputTag>("kShortCollection")),
-  lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection"))
+  lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection")),
+  isMatchByHitsOrChi2_(iConfig.getParameter<bool>("isMatchByHitsOrChi2"))
 {
     genLam = genK0s = realLamFoundEff = realK0sFoundEff = lamCandFound = 
     k0sCandFound = noTPforK0sCand = noTPforLamCand = realK0sFound = realLamFound = 0;
@@ -283,11 +284,8 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::ESHandle<TrackAssociatorBase> associatorByHits;
   iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByHits", associatorByHits);
 
-  //VertexAssociatorBase* associatorByTracks;
-
-  //  edm::ESHandle<VertexAssociatorBase> theTracksAssociator;
-  //  iSetup.get<VertexAssociatorRecord>().get("VertexAssociatorByTracks",theTracksAssociator);
-  //  associatorByTracks = (VertexAssociatorBase *) theTracksAssociator.product();
+  edm::ESHandle<TrackAssociatorBase> associatorByChi2;
+  iSetup.get<TrackAssociatorRecord>().get("TrackAssociatorByChi2", associatorByChi2);
 
   // Get tracks
   Handle< View<reco::Track> > trackCollectionH;
@@ -306,10 +304,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<TrackingParticleCollection>  TPCollectionH ;
   iEvent.getByLabel("mergedtruth", "MergedTrackTruth", TPCollectionH);
   const View<reco::Track>  tC = *( trackCollectionH.product() );
-
-//  edm::Handle<TrackingVertexCollection>  TVCollectionH ;
-//  iEvent.getByLabel("trackingParticles","VertexTruth",TVCollectionH);
-//  const TrackingVertexCollection tVC   = *(TVCollectionH.product());
 
   // Select the primary vertex, create a new reco::Vertex to hold it
   edm::Handle< std::vector<reco::Vertex> > primaryVtxCollectionH;
@@ -332,9 +326,17 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   //cout << "Done with collections, associating reco and sim..." << endl;
  
-  reco::RecoToSimCollection recotosimCollectionH = associatorByHits->associateRecoToSim(trackCollectionH,TPCollectionH,&iEvent );
-  reco::SimToRecoCollection simtorecoCollectionH = associatorByHits->associateSimToReco(trackCollectionH,TPCollectionH,&iEvent );
+  reco::RecoToSimCollection recotosimCollectionH;
+  reco::SimToRecoCollection simtorecoCollectionH;
 
+  if(isMatchByHitsOrChi2_) {
+    recotosimCollectionH = associatorByHits->associateRecoToSim(trackCollectionH,TPCollectionH,&iEvent );
+    simtorecoCollectionH = associatorByHits->associateSimToReco(trackCollectionH,TPCollectionH,&iEvent );
+  }
+  else {
+    recotosimCollectionH = associatorByChi2->associateRecoToSim(trackCollectionH,TPCollectionH,&iEvent );
+    simtorecoCollectionH = associatorByChi2->associateSimToReco(trackCollectionH,TPCollectionH,&iEvent );
+  }
 //  reco::VertexRecoToSimCollection vr2s = associatorByTracks->associateRecoToSim(primaryVtxCollectionH, TVCollectionH, iEvent, r2s);
 //  reco::VertexSimToRecoCollection vs2r = associatorByTracks->associateSimToReco(primaryVtxCollectionH, TVCollectionH, iEvent, s2r);
 

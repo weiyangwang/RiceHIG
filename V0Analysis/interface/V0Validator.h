@@ -204,4 +204,6 @@ private:
 
   edm::InputTag k0sCollectionTag;
   edm::InputTag lamCollectionTag;
+
+  bool isMatchByHitsOrChi2_;
 };
