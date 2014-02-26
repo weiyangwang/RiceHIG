@@ -202,6 +202,8 @@ private:
   TH1D* ksFakeDauRadDist;
   TH1D* lamFakeDauRadDist;
 
+  edm::InputTag trackCollectionTag;
+  edm::InputTag vertexCollectionTag;
   edm::InputTag k0sCollectionTag;
   edm::InputTag lamCollectionTag;
 

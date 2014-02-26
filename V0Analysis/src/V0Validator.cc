@@ -32,6 +32,8 @@ const double protonMass = 0.93827203;
 const double protonMassSquared = protonMass*protonMass;
 
 V0Validator::V0Validator(const edm::ParameterSet& iConfig) : 
+  trackCollectionTag(iConfig.getParameter<edm::InputTag>("trackCollection")),
+  vertexCollectionTag(iConfig.getParameter<edm::InputTag>("vertexCollection")),
   k0sCollectionTag(iConfig.getParameter<edm::InputTag>("kShortCollection")),
   lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection")),
   isMatchByHitsOrChi2_(iConfig.getParameter<bool>("isMatchByHitsOrChi2"))
@@ -289,7 +291,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   // Get tracks
   Handle< View<reco::Track> > trackCollectionH;
-  iEvent.getByLabel("generalTracks", trackCollectionH);
+  iEvent.getByLabel(trackCollectionTag, trackCollectionH);
 
   Handle<SimTrackContainer> simTrackCollection;
   iEvent.getByLabel("g4SimHits", simTrackCollection);
@@ -307,7 +309,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   // Select the primary vertex, create a new reco::Vertex to hold it
   edm::Handle< std::vector<reco::Vertex> > primaryVtxCollectionH;
-  iEvent.getByLabel("offlinePrimaryVertices", primaryVtxCollectionH);
+  iEvent.getByLabel(vertexCollectionTag, primaryVtxCollectionH);
   const reco::VertexCollection primaryVertexCollection   = *(primaryVtxCollectionH.product());
 
   reco::Vertex* thePrimary = 0;
