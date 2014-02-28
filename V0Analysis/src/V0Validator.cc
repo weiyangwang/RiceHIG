@@ -370,7 +370,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       ksMassAll->Fill( mass );
       ksMassPtAll->Fill( K0sCandpT, mass );
       if(K0sCandEta>-2.4 && K0sCandEta<-1.6) ksMassPtAllEta1->Fill( K0sCandpT, mass );
-      if(K0sCandEta>-1.6 && K0sCandEta<-1.6) ksMassPtAllEta2->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-1.6 && K0sCandEta<-0.8) ksMassPtAllEta2->Fill( K0sCandpT, mass );
       if(K0sCandEta>-0.8 && K0sCandEta<0.0) ksMassPtAllEta3->Fill( K0sCandpT, mass );
       if(K0sCandEta>0.0 && K0sCandEta<0.8) ksMassPtAllEta4->Fill( K0sCandpT, mass );
       if(K0sCandEta>0.8 && K0sCandEta<1.6) ksMassPtAllEta5->Fill( K0sCandpT, mass );
