@@ -226,7 +226,9 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   fakeKsMassPt = theDQMstore->make<TH2D>("ksMassPtFake",
                              "Mass vs p_{T} of fake K0S",
                              100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
-
+  goodKsMassPt = theDQMstore->make<TH2D>("ksMassPtGood",
+                             "Mass vs p_{T} of good K0S",
+                             100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
   fakeLamMassPt = theDQMstore->make<TH2D>("lamMassPtFake",
                               "Mass vs p_{T} of fake Lambda",
                               100, 0, 10.0, lamMassNbins, minLamMass, maxLamMass);
@@ -431,7 +433,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Do fake rate calculation //
   //////////////////////////////
 
-  //cout << "Starting K0s fake rate calculation" << endl;
+  // cout << "Starting K0s fake rate calculation" << endl;
   // Kshorts
   double numK0sFound = 0.;
   double mass = 0.;
@@ -571,10 +573,11 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   nKs->Fill( (float) numK0sFound );
   numK0sFound = 0.;
 
-  //cout << "Starting Lambda fake rate calculation" << endl;
+  // cout << "Starting Lambda fake rate calculation" << endl;
   double numLamFound = 0.;
   mass = 0.;
   radDist.clear();
+
   // Lambdas
   if ( lambdaCollection.isValid() && lambdaCollection->size() > 0 ) {
     vector<reco::TrackRef> theDaughterTracks;
@@ -589,7 +592,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       LamCandR = (sqrt( iLam->vertex().perp2() ));
       LamCandStatus = 0;
       mass = iLam->mass();
-      
+
       lamMassAll->Fill( mass );
       lamMassPtAll->Fill( LamCandpT, mass );
       if(LamCandEta>-2.4 && LamCandEta<-1.6) lamMassPtAllEta1->Fill( LamCandpT, mass );
@@ -605,7 +608,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       for (int itrack = 0; itrack < 2; itrack++) {
 	LamPiCandStatus[itrack] = 0;
       }
-      
       std::vector< std::pair<TrackingParticleRef, double> > tp;
       TrackingParticleRef tpref;
       TrackingParticleRef firstDauTP;
@@ -627,7 +629,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    }
 	    TrackingVertexRef parentVertex = tpref->parentVertex();
 	    if( parentVertex.isNonnull() ) radDist.push_back(parentVertex->position().R());
-	     
+
 	    if( parentVertex.isNonnull() ) {
 	      if( LamVtx.isNonnull() ) {
 		if( LamVtx->position() == parentVertex->position() ) {
@@ -640,7 +642,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
 			 iTP != parentVertex->sourceTracks_end(); ++iTP) {
 		      if( fabs((*iTP)->pdgId()) == 3122 ) {
-                        if((*iTP)->parentVertex().isNonnull() && (*iTP)->parentVertex()->nSourceTracks() != 0) {
+                        if((*iTP)->parentVertex().isNonnull() && (*iTP)->parentVertex()->nSourceTracks()!= 0) {
                           TrackingVertex::tp_iterator genmother = (*iTP)->parentVertex()->sourceTracks_begin();
                           double mid = (*genmother)->pdgId();
                           if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) LamCandStatus=10;
@@ -721,7 +723,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // Do efficiency calculation //
   ///////////////////////////////
 
-  //cout << "Starting Lambda efficiency" << endl;
+  // cout << "Starting Lambda efficiency" << endl;
   // Lambdas
 
   for(TrackingParticleCollection::size_type i = 0; i < tPCeff.size(); i++) {
@@ -874,7 +876,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   //Kshorts
 
-  //cout << "Starting Kshort efficiency" << endl;
+  // cout << "Starting Kshort efficiency" << endl;
   for (TrackingParticleCollection::size_type i=0; i<tPCeff.size(); i++){
     TrackingParticleRef tpr1(TPCollectionEff, i);
     TrackingParticle* itp1=const_cast<TrackingParticle*>(tpr1.get());
@@ -894,7 +896,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    for (TrackingParticleCollection::size_type j=0; j<tPCeff.size(); j++){
 	      TrackingParticleRef tpr2(TPCollectionEff, j);
 	      TrackingParticle* itp2=const_cast<TrackingParticle*>(tpr2.get());
-	      
 	      if ( itp2->pdgId() == -211 && itp2->parentVertex().isNonnull()  
 		   && fabs(itp2->momentum().eta()) < 2.4 
 		   && sqrt(itp2->momentum().perp2()) > 0.2) {
@@ -936,7 +937,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      else {
 			K0sGenStatus = 2;
 		      }
-
 		      // Check if the generated Ks tracks were found or not
 		      // by searching the recoTracks list for a match to the trackingParticles
 
@@ -993,6 +993,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			}
 			ksEffVsR_denom->Fill(K0sGenR);
 		      }
+
 		      if(fabs(K0sGenEta) > 0. && K0sGenpT > 0.) {
 			if(K0sGenStatus == 1) {
 			  ksEffVsEta_num->Fill(K0sGenEta);

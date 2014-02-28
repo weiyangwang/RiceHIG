@@ -78,7 +78,7 @@ void V0Selector::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
    const reco::Vertex & vtx = (*vertices)[0];
    bestvz = vtx.z(); bestvx = vtx.x(); bestvy = vtx.y();
    bestvzError = vtx.zError(); bestvxError = vtx.xError(); bestvyError = vtx.yError();
-   if(bestvz < -15.0 || bestvz>15.0) return;
+//   if(bestvz < -15.0 || bestvz>15.0) return;
 
    edm::Handle<reco::VertexCompositeCandidateCollection> v0candidates;
    iEvent.getByLabel(v0CollName_,v0IDName_,v0candidates);
