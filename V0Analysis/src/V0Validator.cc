@@ -205,10 +205,10 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   double maxKsMass = 0.49767 + 0.2;
   double minLamMass = 1.1156 - 0.2;
   double maxLamMass = 1.1156 + 0.2;
-  int ksMassNbins = 300;
+  int ksMassNbins = 800;
   double ksMassXmin = minKsMass;
   double ksMassXmax = maxKsMass;
-  int lamMassNbins = 300;
+  int lamMassNbins = 800;
   double lamMassXmin = minLamMass;
   double lamMassXmax = maxLamMass;
 
