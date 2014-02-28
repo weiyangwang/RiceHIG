@@ -36,7 +36,8 @@ V0Validator::V0Validator(const edm::ParameterSet& iConfig) :
   vertexCollectionTag(iConfig.getParameter<edm::InputTag>("vertexCollection")),
   k0sCollectionTag(iConfig.getParameter<edm::InputTag>("kShortCollection")),
   lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection")),
-  isMatchByHitsOrChi2_(iConfig.getParameter<bool>("isMatchByHitsOrChi2"))
+  isMatchByHitsOrChi2_(iConfig.getParameter<bool>("isMatchByHitsOrChi2")),
+  isMergedTruth_(iConfig.getParameter<bool>("isMergedTruth"))
 {
     genLam = genK0s = realLamFoundEff = realK0sFoundEff = lamCandFound = 
     k0sCandFound = noTPforK0sCand = noTPforLamCand = realK0sFound = realLamFound = 0;
@@ -320,8 +321,84 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   reco::SimToRecoCollection simtorecoCollectionH = *( simtorecoH.product() );
 */
 
+  //////////////////////////////////
+  // Fill generated V0 candidates //
+  //////////////////////////////////
+
   edm::Handle<reco::GenParticleCollection> genParticleCollection;
   iEvent.getByLabel("genParticles",genParticleCollection);
+  for(unsigned it=0; it<genParticleCollection->size(); ++it) {
+
+    const reco::GenParticle & genCand = (*genParticleCollection)[it];
+    int id = genCand.pdgId();
+
+    double eta = genCand.eta();
+    double pt  = genCand.pt();
+
+    if(fabs(id)==310) ksGenVsEtaPt->Fill(eta,pt);
+
+    double mid=0;
+    if(fabs(id)==3122){
+      if(genCand.numberOfMothers()==1){
+        const reco::Candidate * mom = genCand.mother();
+        mid = mom->pdgId();
+        if(mom->numberOfMothers()==1){
+          const reco::Candidate * mom1 = mom->mother();
+          mid = mom1->pdgId();
+        }
+      }
+      if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) continue;
+      lamGenVsEtaPt->Fill(eta,pt);
+    }
+  }
+
+  //get the V0s;   
+  edm::Handle<reco::VertexCompositeCandidateCollection> k0sCollection;
+  edm::Handle<reco::VertexCompositeCandidateCollection> lambdaCollection;
+  iEvent.getByLabel(k0sCollectionTag, k0sCollection);
+  iEvent.getByLabel(lamCollectionTag, lambdaCollection);
+  double mass = 0.;
+  if ( k0sCollection.isValid() && k0sCollection->size() > 0 ) {
+    for( reco::VertexCompositeCandidateCollection::const_iterator iK0s = k0sCollection->begin();
+         iK0s != k0sCollection->end();
+         iK0s++) {
+      // Fill values to be histogrammed
+      K0sCandpT = (sqrt( iK0s->momentum().perp2() ));
+      K0sCandEta = iK0s->momentum().eta();
+      mass = iK0s->mass();
+
+      ksMassAll->Fill( mass );
+      ksMassPtAll->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-2.4 && K0sCandEta<-1.6) ksMassPtAllEta1->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-1.6 && K0sCandEta<-1.6) ksMassPtAllEta2->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-0.8 && K0sCandEta<0.0) ksMassPtAllEta3->Fill( K0sCandpT, mass );
+      if(K0sCandEta>0.0 && K0sCandEta<0.8) ksMassPtAllEta4->Fill( K0sCandpT, mass );
+      if(K0sCandEta>0.8 && K0sCandEta<1.6) ksMassPtAllEta5->Fill( K0sCandpT, mass );
+      if(K0sCandEta>1.6 && K0sCandEta<2.4) ksMassPtAllEta6->Fill( K0sCandpT, mass );
+    }
+  }
+  if ( lambdaCollection.isValid() && lambdaCollection->size() > 0 ) {
+    vector<reco::TrackRef> theDaughterTracks;
+    for( reco::VertexCompositeCandidateCollection::const_iterator iLam = lambdaCollection->begin();
+         iLam != lambdaCollection->end();
+         iLam++) {
+      // Fill values to be histogrammed
+      LamCandpT = (sqrt( iLam->momentum().perp2() ));
+      LamCandEta = iLam->momentum().eta();
+      mass = iLam->mass();
+
+      lamMassAll->Fill( mass );
+      lamMassPtAll->Fill( LamCandpT, mass );
+      if(LamCandEta>-2.4 && LamCandEta<-1.6) lamMassPtAllEta1->Fill( LamCandpT, mass );
+      if(LamCandEta>-1.6 && LamCandEta<-0.8) lamMassPtAllEta2->Fill( LamCandpT, mass );
+      if(LamCandEta>-0.8 && LamCandEta<0.0) lamMassPtAllEta3->Fill( LamCandpT, mass );
+      if(LamCandEta>0.0 && LamCandEta<0.8) lamMassPtAllEta4->Fill( LamCandpT, mass );
+      if(LamCandEta>0.8 && LamCandEta<1.6) lamMassPtAllEta5->Fill( LamCandpT, mass );
+      if(LamCandEta>1.6 && LamCandEta<2.4) lamMassPtAllEta6->Fill( LamCandpT, mass );
+    }
+  }
+
+  if(!isMergedTruth_) return;
 
   edm::Handle<TrackingParticleCollection>  TPCollectionEff ;
   iEvent.getByLabel("mergedtruth", "MergedTrackTruth", TPCollectionEff);
@@ -386,12 +463,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 //  reco::VertexRecoToSimCollection vr2s = associatorByTracks->associateRecoToSim(primaryVtxCollectionH, TVCollectionH, iEvent, r2s);
 //  reco::VertexSimToRecoCollection vs2r = associatorByTracks->associateSimToReco(primaryVtxCollectionH, TVCollectionH, iEvent, s2r);
 
-  //get the V0s;   
-  edm::Handle<reco::VertexCompositeCandidateCollection> k0sCollection;
-  edm::Handle<reco::VertexCompositeCandidateCollection> lambdaCollection;
-  iEvent.getByLabel(k0sCollectionTag, k0sCollection);
-  iEvent.getByLabel(lamCollectionTag, lambdaCollection);
-
   //make vector of pair of trackingParticles to hold good V0 candidates
   std::vector< pair<TrackingParticleRef, TrackingParticleRef> > trueK0s;
   std::vector< pair<TrackingParticleRef, TrackingParticleRef> > trueLams;
@@ -400,35 +471,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<double> trueKsPt;
   std::vector<double> trueLamPt;
 
-  //////////////////////////////////
-  // Fill generated V0 candidates //
-  //////////////////////////////////
-
-  for(unsigned it=0; it<genParticleCollection->size(); ++it) {
-
-    const reco::GenParticle & genCand = (*genParticleCollection)[it];
-    int id = genCand.pdgId();
-
-    double eta = genCand.eta();
-    double pt  = genCand.pt();
-
-    if(fabs(id)==310) ksGenVsEtaPt->Fill(eta,pt);
-
-    double mid=0;
-    if(fabs(id)==3122){
-      if(genCand.numberOfMothers()==1){
-        const reco::Candidate * mom = genCand.mother();
-        mid = mom->pdgId();
-        if(mom->numberOfMothers()==1){
-          const reco::Candidate * mom1 = mom->mother();
-          mid = mom1->pdgId();
-        }
-      }
-      if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) continue;
-      lamGenVsEtaPt->Fill(eta,pt);
-    }
-  }
-
   //////////////////////////////
   // Do fake rate calculation //
   //////////////////////////////
@@ -436,7 +478,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   // cout << "Starting K0s fake rate calculation" << endl;
   // Kshorts
   double numK0sFound = 0.;
-  double mass = 0.;
   std::vector<double> radDist;
   // cout << "K0s collection size: " << k0sCollection->size() << endl;
   if ( k0sCollection.isValid() && k0sCollection->size() > 0 ) {
@@ -450,15 +491,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       K0sCandR = (sqrt( iK0s->vertex().perp2() ));
       K0sCandStatus = 0;
       mass = iK0s->mass();
-
-      ksMassAll->Fill( mass );
-      ksMassPtAll->Fill( K0sCandpT, mass );
-      if(K0sCandEta>-2.4 && K0sCandEta<-1.6) ksMassPtAllEta1->Fill( K0sCandpT, mass );
-      if(K0sCandEta>-1.6 && K0sCandEta<-1.6) ksMassPtAllEta2->Fill( K0sCandpT, mass );
-      if(K0sCandEta>-0.8 && K0sCandEta<0.0) ksMassPtAllEta3->Fill( K0sCandpT, mass );
-      if(K0sCandEta>0.0 && K0sCandEta<0.8) ksMassPtAllEta4->Fill( K0sCandpT, mass );
-      if(K0sCandEta>0.8 && K0sCandEta<1.6) ksMassPtAllEta5->Fill( K0sCandpT, mass );
-      if(K0sCandEta>1.6 && K0sCandEta<2.4) ksMassPtAllEta6->Fill( K0sCandpT, mass );
 
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iK0s->daughter(0)) )).track() );
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iK0s->daughter(1)) )).track() );
@@ -584,23 +616,12 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     for( reco::VertexCompositeCandidateCollection::const_iterator iLam = lambdaCollection->begin();
 	 iLam != lambdaCollection->end();
 	 iLam++) {
-      // Fill mass plot with ALL lambdas
-      lamMassAll->Fill( iLam->mass() );
       // Fill values to be histogrammed
       LamCandpT = (sqrt( iLam->momentum().perp2() ));
       LamCandEta = iLam->momentum().eta();
       LamCandR = (sqrt( iLam->vertex().perp2() ));
       LamCandStatus = 0;
       mass = iLam->mass();
-
-      lamMassAll->Fill( mass );
-      lamMassPtAll->Fill( LamCandpT, mass );
-      if(LamCandEta>-2.4 && LamCandEta<-1.6) lamMassPtAllEta1->Fill( LamCandpT, mass );
-      if(LamCandEta>-1.6 && LamCandEta<-0.8) lamMassPtAllEta2->Fill( LamCandpT, mass );
-      if(LamCandEta>-0.8 && LamCandEta<0.0) lamMassPtAllEta3->Fill( LamCandpT, mass );
-      if(LamCandEta>0.0 && LamCandEta<0.8) lamMassPtAllEta4->Fill( LamCandpT, mass );
-      if(LamCandEta>0.8 && LamCandEta<1.6) lamMassPtAllEta5->Fill( LamCandpT, mass );
-      if(LamCandEta>1.6 && LamCandEta<2.4) lamMassPtAllEta6->Fill( LamCandpT, mass );
 
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iLam->daughter(0)) )).track() );
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iLam->daughter(1)) )).track() );

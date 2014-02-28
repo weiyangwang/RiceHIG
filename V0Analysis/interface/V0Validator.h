@@ -224,4 +224,5 @@ private:
   edm::InputTag lamCollectionTag;
 
   bool isMatchByHitsOrChi2_;
+  bool isMergedTruth_;
 };

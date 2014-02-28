@@ -4,29 +4,35 @@ process = cms.Process("V0Val")
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
 ### standard includes
+process.load('Configuration.StandardSequences.Generator_cff')
+process.load('GeneratorInterface.HiGenCommon.VtxSmearedRealisticPPbBoost8TeVCollision_cff')
+process.load('GeneratorInterface.Core.genFilterSummary_cff')
+process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load("Configuration.StandardSequences.Digi_cff")
+process.load("Configuration.StandardSequences.DigiToRaw_cff")
 process.load('Configuration.StandardSequences.GeometryDB_cff')
 process.load("Configuration.StandardSequences.RawToDigi_cff")
 process.load("Configuration.EventContent.EventContent_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 process.load("SimGeneral.MixingModule.mixNoPU_cfi")
+process.load("SimGeneral.TrackingAnalysis.trackingParticles_cfi")
 
 ### conditions
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'STARTHI53_V17::All'
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(100)
 )
 
 process.source = cms.Source("PoolSource",
                                 fileNames = cms.untracked.vstring(
 #'/store/user/vzhukova/HIJING_MB/HIJING_MB_RECO_v3/13a591fee6315e7fb1e99e6ba8e52eaa/reco_hijing_2582_1_tV4.root'
-'/store/user/vzhukova/HIJING_MB/HIJING_MB_RECO_v3/13a591fee6315e7fb1e99e6ba8e52eaa/reco_hijing_1000_1_Bov.root'
+#'/store/user/vzhukova/HIJING_MB/HIJING_MB_RECO_v3/13a591fee6315e7fb1e99e6ba8e52eaa/reco_hijing_1000_1_Bov.root'
 #'/store/user/vzhukova/HYDGET_PERIPH_batch7/HYDGET_PERIPH_RECO_batch7/b7d33bba7673cdb1ee6f4983c0800c79/HYDGET_PERIPH_RECO_10_1_7bq.root'
 #'root://xrootd1.cmsaf.mit.edu//store/user/vzhukova/HIJING_GEN-SIM_YUE-SHI_Minbias_2_v1/HIJING_RECO_YUE-SHI_Minbias__2_v1/b7d33bba7673cdb1ee6f4983c0800c79/hijing_reco_fix_4_2_RU0.root'
-#'root://xrootd1.cmsaf.mit.edu//store/himc/HiWinter13/Hijing_PPb502_MinimumBias/GEN-SIM-RECO/pa_STARTHI53_V25-v1/30000/64B44ED9-EF77-E211-825A-00266CF97FF4.root'
+'root://xrootd1.cmsaf.mit.edu//store/himc/HiWinter13/Hijing_PPb502_MinimumBias/GEN-SIM-RECO/pa_STARTHI53_V25-v1/30000/64B44ED9-EF77-E211-825A-00266CF97FF4.root'
                 )
                             )
 
@@ -50,6 +56,7 @@ process.generalV0CandidatesNew = process.generalV0Candidates.clone (
 process.v0Validator.kShortCollection = cms.InputTag('selectV0CandidatesNewkshort:Kshort')
 process.v0Validator.lambdaCollection = cms.InputTag('selectV0CandidatesNewlambda:Lambda')
 process.v0Validator.isMatchByHitsOrChi2 = cms.bool(True)
+process.v0Validator.isMergedTruth = cms.bool(False)
 
 process.selectV0CandidatesNewlambda.v0CollName = cms.string("generalV0CandidatesNew")
 process.selectV0CandidatesNewkshort.v0CollName = cms.string("generalV0CandidatesNew")
