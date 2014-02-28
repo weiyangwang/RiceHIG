@@ -70,6 +70,11 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   for(double eta = etaMin; eta < etaMax + etaWidth/2; eta += etaWidth)
     etaBins.push_back(eta);
 
+  ksGenVsEtaPt = theDQMstore->make<TH2D>("K0sGenVsEtaPt",
+                           "Generated K^{0}_{S} vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
+  lamGenVsEtaPt = theDQMstore->make<TH2D>("LamGenVsEtaPt",
+                           "Generated #Lambda^{0} vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
+
   ksEffVsR_num = theDQMstore->make<TH1D>("K0sEffVsR_num", 
 			  "K^{0}_{S} Efficiency vs #rho", 40, 0., 40.);
   ksEffVsEta_num = theDQMstore->make<TH1D>("K0sEffVsEta_num",
@@ -221,9 +226,7 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   fakeKsMassPt = theDQMstore->make<TH2D>("ksMassPtFake",
                              "Mass vs p_{T} of fake K0S",
                              100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
-  goodKsMassPt = theDQMstore->make<TH2D>("ksMassPtGood",
-                             "Mass vs p_{T} of good reco K0S",
-                             100, 0, 10.0, ksMassNbins, minKsMass, maxKsMass);
+
   fakeLamMassPt = theDQMstore->make<TH2D>("lamMassPtFake",
                               "Mass vs p_{T} of fake Lambda",
                               100, 0, 10.0, lamMassNbins, minLamMass, maxLamMass);
@@ -240,7 +243,43 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   ksMassPtAll = theDQMstore->make<TH2D>("ksMassPtAll",
                                   "Invariant mass vs p_{T} of all K0S", 
                                   100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  ksMassPtAllEta1 = theDQMstore->make<TH2D>("ksMassPtAllEta1",
+                                  "Invariant mass vs p_{T} of all K0S",
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  ksMassPtAllEta2 = theDQMstore->make<TH2D>("ksMassPtAllEta2",
+                                  "Invariant mass vs p_{T} of all K0S",
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  ksMassPtAllEta3 = theDQMstore->make<TH2D>("ksMassPtAllEta3",
+                                  "Invariant mass vs p_{T} of all K0S",
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  ksMassPtAllEta4 = theDQMstore->make<TH2D>("ksMassPtAllEta4",
+                                  "Invariant mass vs p_{T} of all K0S",
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  ksMassPtAllEta5 = theDQMstore->make<TH2D>("ksMassPtAllEta5",
+                                  "Invariant mass vs p_{T} of all K0S",
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
+  ksMassPtAllEta6 = theDQMstore->make<TH2D>("ksMassPtAllEta6",
+                                  "Invariant mass vs p_{T} of all K0S",
+                                  100, 0, 10.0, ksMassNbins, ksMassXmin, ksMassXmax);
   lamMassPtAll = theDQMstore->make<TH2D>("lamMassPtAll",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
+  lamMassPtAllEta1 = theDQMstore->make<TH2D>("lamMassPtAllEta1",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
+  lamMassPtAllEta2 = theDQMstore->make<TH2D>("lamMassPtAllEta2",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
+  lamMassPtAllEta3 = theDQMstore->make<TH2D>("lamMassPtAllEta3",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
+  lamMassPtAllEta4 = theDQMstore->make<TH2D>("lamMassPtAllEta4",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
+  lamMassPtAllEta5 = theDQMstore->make<TH2D>("lamMassPtAllEta5",
+                                   "Invariant mass vs p_{T} of all #Lambda^{0}",
+                                   100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
+  lamMassPtAllEta6 = theDQMstore->make<TH2D>("lamMassPtAllEta6",
                                    "Invariant mass vs p_{T} of all #Lambda^{0}",
                                    100, 0, 10.0, lamMassNbins, lamMassXmin, lamMassXmax);
 
@@ -278,6 +317,9 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   iEvent.getByLabel("trackingParticleRecoTrackAsssociation", simtorecoH);
   reco::SimToRecoCollection simtorecoCollectionH = *( simtorecoH.product() );
 */
+
+  edm::Handle<reco::GenParticleCollection> genParticleCollection;
+  iEvent.getByLabel("genParticles",genParticleCollection);
 
   edm::Handle<TrackingParticleCollection>  TPCollectionEff ;
   iEvent.getByLabel("mergedtruth", "MergedTrackTruth", TPCollectionEff);
@@ -356,6 +398,35 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   std::vector<double> trueKsPt;
   std::vector<double> trueLamPt;
 
+  //////////////////////////////////
+  // Fill generated V0 candidates //
+  //////////////////////////////////
+
+  for(unsigned it=0; it<genParticleCollection->size(); ++it) {
+
+    const reco::GenParticle & genCand = (*genParticleCollection)[it];
+    int id = genCand.pdgId();
+
+    double eta = genCand.eta();
+    double pt  = genCand.pt();
+
+    if(fabs(id)==310) ksGenVsEtaPt->Fill(eta,pt);
+
+    double mid=0;
+    if(fabs(id)==3122){
+      if(genCand.numberOfMothers()==1){
+        const reco::Candidate * mom = genCand.mother();
+        mid = mom->pdgId();
+        if(mom->numberOfMothers()==1){
+          const reco::Candidate * mom1 = mom->mother();
+          mid = mom1->pdgId();
+        }
+      }
+      if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) continue;
+      lamGenVsEtaPt->Fill(eta,pt);
+    }
+  }
+
   //////////////////////////////
   // Do fake rate calculation //
   //////////////////////////////
@@ -380,6 +451,12 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       ksMassAll->Fill( mass );
       ksMassPtAll->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-2.4 && K0sCandEta<-1.6) ksMassPtAllEta1->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-1.6 && K0sCandEta<-1.6) ksMassPtAllEta2->Fill( K0sCandpT, mass );
+      if(K0sCandEta>-0.8 && K0sCandEta<0.0) ksMassPtAllEta3->Fill( K0sCandpT, mass );
+      if(K0sCandEta>0.0 && K0sCandEta<0.8) ksMassPtAllEta4->Fill( K0sCandpT, mass );
+      if(K0sCandEta>0.8 && K0sCandEta<1.6) ksMassPtAllEta5->Fill( K0sCandpT, mass );
+      if(K0sCandEta>1.6 && K0sCandEta<2.4) ksMassPtAllEta6->Fill( K0sCandpT, mass );
 
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iK0s->daughter(0)) )).track() );
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iK0s->daughter(1)) )).track() );
@@ -414,10 +491,14 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      if( k0sVtx.isNonnull() ) {
 		if( k0sVtx->position() == parentVertex->position() ) {
 		  if( parentVertex->nDaughterTracks() == 2 ) {
-		    if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
-//		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
-//			 iTP != parentVertex->sourceTracks_end(); iTP++) {
-//		      if( fabs((*iTP)->pdgId()) == 310 ) {
+            	    if( parentVertex->nSourceTracks() == 0 ) {
+                      // No source tracks found for K0s vertex; shouldn't happen, but does for evtGen events
+                      K0sCandStatus = 6;
+                    }
+//		    if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
+		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
+			 iTP != parentVertex->sourceTracks_end(); iTP++) {
+		      if( fabs((*iTP)->pdgId()) == 310 ) {
 			K0sCandStatus = 1;
 			realK0sFound++;
 			numK0sFound += 1.;
@@ -426,14 +507,15 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			trueK0s.push_back(pair);
 			trueKsMasses.push_back(mass);
                         trueKsPt.push_back(K0sCandpT);
-		    }
-		    else {
+		      }
+		      else {
 			K0sCandStatus = 2;
-//			if( fabs((*iTP)->pdgId()) == 3122 ) {
-                        if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212)) {
+			if( fabs((*iTP)->pdgId()) == 3122 ) {
+//                        if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212)) {
 			  K0sCandStatus = 7;
 			}
-		    }
+		      }
+                    }
 		  }
 		  else {
 		    // Found a bad match because the mother has too many daughters
@@ -510,6 +592,12 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       
       lamMassAll->Fill( mass );
       lamMassPtAll->Fill( LamCandpT, mass );
+      if(LamCandEta>-2.4 && LamCandEta<-1.6) lamMassPtAllEta1->Fill( LamCandpT, mass );
+      if(LamCandEta>-1.6 && LamCandEta<-0.8) lamMassPtAllEta2->Fill( LamCandpT, mass );
+      if(LamCandEta>-0.8 && LamCandEta<0.0) lamMassPtAllEta3->Fill( LamCandpT, mass );
+      if(LamCandEta>0.0 && LamCandEta<0.8) lamMassPtAllEta4->Fill( LamCandpT, mass );
+      if(LamCandEta>0.8 && LamCandEta<1.6) lamMassPtAllEta5->Fill( LamCandpT, mass );
+      if(LamCandEta>1.6 && LamCandEta<2.4) lamMassPtAllEta6->Fill( LamCandpT, mass );
 
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iLam->daughter(0)) )).track() );
       theDaughterTracks.push_back( (*(dynamic_cast<const reco::RecoChargedCandidate *> (iLam->daughter(1)) )).track() );
@@ -544,26 +632,38 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      if( LamVtx.isNonnull() ) {
 		if( LamVtx->position() == parentVertex->position() ) {
 		  if( parentVertex->nDaughterTracks() == 2 ) {
-		    if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) ) {
-//		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
-//			 iTP != parentVertex->sourceTracks_end(); ++iTP) {
-//		      if( fabs((*iTP)->pdgId()) == 3122 ) {
-			LamCandStatus = 1;
-			realLamFound++;
-			numLamFound += 1.;
-			std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
-			// Pushing back a good V0
-			trueLams.push_back(pair);
-			trueLamMasses.push_back(mass);
-                        trueLamPt.push_back(LamCandpT);
-		    }
-		    else {
+                    if( parentVertex->nSourceTracks() == 0 ) {
+                      // No source tracks found for Lam vertex; shouldn't happen, but does for evtGen events
+                      LamCandStatus = 6;
+                    }
+//		    if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) ) {
+		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
+			 iTP != parentVertex->sourceTracks_end(); ++iTP) {
+		      if( fabs((*iTP)->pdgId()) == 3122 ) {
+                        if((*iTP)->parentVertex().isNonnull() && (*iTP)->parentVertex()->nSourceTracks() != 0) {
+                          TrackingVertex::tp_iterator genmother = (*iTP)->parentVertex()->sourceTracks_begin();
+                          double mid = (*genmother)->pdgId();
+                          if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) LamCandStatus=10;
+                        } 
+                        else {
+	  		  LamCandStatus = 1;
+		  	  realLamFound++;
+			  numLamFound += 1.;
+		  	  std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
+		 	  // Pushing back a good V0
+			  trueLams.push_back(pair);
+			  trueLamMasses.push_back(mass);
+                          trueLamPt.push_back(LamCandpT);
+                        }
+		      }
+		      else {
 			LamCandStatus = 2;
-//			if( fabs((*iTP)->pdgId() ) == 310 ) {
-                        if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
+			if( fabs((*iTP)->pdgId() ) == 310 ) {
+//                        if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
 			  LamCandStatus = 7;
 			}
-	            }
+	              }
+                    }
 		  }
 		  else {
 		    // Found a bad match because the mother has too many daughters

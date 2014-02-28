@@ -71,7 +71,7 @@
 
 #include "RecoVertex/VertexTools/interface/VertexDistance3D.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
-
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include "HepMC/GenVertex.h"
 #include "HepMC/GenParticle.h"
@@ -110,6 +110,10 @@ private:
   std::vector<double> etaBins, ptBins;
 
   edm::Service<TFileService> theDQMstore;
+
+  // generated V0
+  TH2D* ksGenVsEtaPt;
+  TH2D* lamGenVsEtaPt;
 
   // kshort eff numerator
   TH1D* ksEffVsR_num;
@@ -197,7 +201,19 @@ private:
   TH1D* ksMassAll;
   TH1D* lamMassAll;
   TH2D* ksMassPtAll;
+  TH2D* ksMassPtAllEta1;
+  TH2D* ksMassPtAllEta2;
+  TH2D* ksMassPtAllEta3;
+  TH2D* ksMassPtAllEta4;
+  TH2D* ksMassPtAllEta5;
+  TH2D* ksMassPtAllEta6;
   TH2D* lamMassPtAll;
+  TH2D* lamMassPtAllEta1;
+  TH2D* lamMassPtAllEta2;
+  TH2D* lamMassPtAllEta3;
+  TH2D* lamMassPtAllEta4;
+  TH2D* lamMassPtAllEta5;
+  TH2D* lamMassPtAllEta6;
 
   TH1D* ksFakeDauRadDist;
   TH1D* lamFakeDauRadDist;
