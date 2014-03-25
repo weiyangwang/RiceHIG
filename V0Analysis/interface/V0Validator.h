@@ -117,6 +117,8 @@ private:
 
   // kshort eff numerator
   TH1D* ksEffVsR_num;
+  TH2D* ksEffVsEtaR_num;
+  TH2D* ksEffVsPtR_num;
   TH1D* ksEffVsEta_num;
   TH1D* ksEffVsPt_num;
   TH2D* ksEffVsEtaPt_num;
@@ -130,6 +132,10 @@ private:
   TH1D* ksFakeVsEta_num;
   TH1D* ksFakeVsPt_num;
   TH2D* ksFakeVsEtaPt_num;
+  TH1D* ksSecVsR_num;
+  TH1D* ksSecVsEta_num;
+  TH1D* ksSecVsPt_num;
+  TH2D* ksSecVsEtaPt_num;
   TH1D* ksTkFakeVsR_num;
   TH1D* ksTkFakeVsEta_num;
   TH1D* ksTkFakeVsPt_num;
@@ -141,6 +147,8 @@ private:
   TH1D* ksFakeVsPt_denom;
   TH2D* ksFakeVsEtaPt_denom;
   TH1D* ksEffVsR_denom;
+  TH2D* ksEffVsEtaR_denom;
+  TH2D* ksEffVsPtR_denom;
   TH1D* ksEffVsEta_denom;
   TH1D* ksEffVsPt_denom;
   TH2D* ksEffVsEtaPt_denom;
@@ -151,15 +159,29 @@ private:
   TH1D* lamFakeVsPt_denom;
   TH2D* lamFakeVsEtaPt_denom;
   TH1D* lamEffVsR_denom;
+  TH2D* lamEffVsEtaR_denom;
+  TH2D* lamEffVsPtR_denom;
   TH1D* lamEffVsEta_denom;
   TH1D* lamEffVsPt_denom;
   TH2D* lamEffVsEtaPt_denom;
+  TH1D* lamEffVsPt_denom_test;
+  TH2D* lamEffVsEtaPt_denom_test;
 
   // lambda eff numerator
   TH1D* lamEffVsR_num;
+  TH2D* lamEffVsEtaR_num;
+  TH2D* lamEffVsPtR_num;
   TH1D* lamEffVsEta_num;
   TH1D* lamEffVsPt_num;
   TH2D* lamEffVsEtaPt_num;
+  TH1D* lamSecVsR_num;
+  TH1D* lamSecVsEta_num;
+  TH1D* lamSecVsPt_num;
+  TH2D* lamSecVsEtaPt_num;
+  TH1D* lamCascadeVsR_num;
+  TH1D* lamCascadeVsEta_num;
+  TH1D* lamCascadeVsPt_num;
+  TH2D* lamCascadeVsEtaPt_num;
   TH1D* lamTkEffVsR_num;
   TH1D* lamTkEffVsEta_num;
   TH1D* lamTkEffVsPt_num;
@@ -218,8 +240,12 @@ private:
   TH1D* ksFakeDauRadDist;
   TH1D* lamFakeDauRadDist;
 
+  TH2D* ksResolutionPt;
+  TH2D* lamResolutionPt;
+
   edm::InputTag trackCollectionTag;
   edm::InputTag vertexCollectionTag;
+  edm::InputTag genParticleCollectionTag;
   edm::InputTag k0sCollectionTag;
   edm::InputTag lamCollectionTag;
 

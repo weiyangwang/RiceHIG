@@ -1,4 +1,4 @@
-// -*- C++ -*-
+
 //
 // Package:    V0Validator
 // Class:      V0Validator
@@ -36,6 +36,7 @@ V0Validator::V0Validator(const edm::ParameterSet& iConfig) :
   vertexCollectionTag(iConfig.getParameter<edm::InputTag>("vertexCollection")),
   k0sCollectionTag(iConfig.getParameter<edm::InputTag>("kShortCollection")),
   lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection")),
+  genParticleCollectionTag(iConfig.getParameter<edm::InputTag>("genParticleCollection")),
   isMatchByHitsOrChi2_(iConfig.getParameter<bool>("isMatchByHitsOrChi2")),
   isMergedTruth_(iConfig.getParameter<bool>("isMergedTruth"))
 {
@@ -82,6 +83,10 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
   ksEffVsPt_num = theDQMstore->make<TH1D>("K0sEffVsPt_num",
 			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);;
+  ksEffVsPtR_num = theDQMstore->make<TH2D>("K0sEffVsPtR_num",
+                           "K^{0}_{S} Efficiency vs R and p_{T}", 40, 0., 40., 100, 0, 10.);
+  ksEffVsEtaR_num = theDQMstore->make<TH2D>("K0sEffVsEtaR_num",
+                           "K^{0}_{S} Efficiency vs R and #eta", 40, 0., 40., 40, -2.5, 2.5);
   ksEffVsEtaPt_num = theDQMstore->make<TH2D>("K0sEffVsEtaPt_num",
                            "K^{0}_{S} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
@@ -100,6 +105,10 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			    "K^{0}_{S} Efficiency vs #eta", 40, -2.5, 2.5);
   ksEffVsPt_denom = theDQMstore->make<TH1D>("K0sEffVsPt_denom",
 			   "K^{0}_{S} Efficiency vs p_{T}", 70, 0., 20.);
+  ksEffVsPtR_denom = theDQMstore->make<TH2D>("K0sEffVsPtR_denom",
+                           "K^{0}_{S} Efficiency vs R and p_{T}", 40, 0., 40., 100, 0, 10.);
+  ksEffVsEtaR_denom = theDQMstore->make<TH2D>("K0sEffVsEtaR_denom",
+                           "K^{0}_{S} Efficiency vs R and #eta", 40, 0., 40., 40, -2.5, 2.5);
   ksEffVsEtaPt_denom = theDQMstore->make<TH2D>("K0sEffVsEtaPt_denom",
                            "K^{0}_{S} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
@@ -109,6 +118,10 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
   lamEffVsPt_num = theDQMstore->make<TH1D>("LamEffVsPt_num",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
+  lamEffVsPtR_num = theDQMstore->make<TH2D>("LamEffVsPtR_num",
+                           "#Lambda^{0} Efficiency vs R and p_{T}", 40, 0., 40., 100, 0, 10.);
+  lamEffVsEtaR_num = theDQMstore->make<TH2D>("LamEffVsEtaR_num",
+                           "#Lambda^{0} Efficiency vs R and #eta", 40, 0., 40., 40, -2.5, 2.5);
   lamEffVsEtaPt_num = theDQMstore->make<TH2D>("LamEffVsEtaPt_num",
                            "#Lambda^{0} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
@@ -127,7 +140,15 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "#Lambda^{0} Efficiency vs #eta", 40, -2.5, 2.5);
   lamEffVsPt_denom = theDQMstore->make<TH1D>("LamEffVsPt_denom",
 			    "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
+  lamEffVsPtR_denom = theDQMstore->make<TH2D>("LamEffVsPtR_denom",
+                           "#Lambda^{0} Efficiency vs R and p_{T}", 40, 0., 40., 100, 0, 10.);
+  lamEffVsEtaR_denom = theDQMstore->make<TH2D>("LamEffVsEtaR_denom",
+                           "#Lambda^{0} Efficiency vs R and #eta", 40, 0., 40., 40, -2.5, 2.5);
   lamEffVsEtaPt_denom = theDQMstore->make<TH2D>("LamEffVsEtaPt_denom",
+                           "#Lambda^{0} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
+  lamEffVsPt_denom_test = theDQMstore->make<TH1D>("LamEffVsPt_denom_test",
+                            "#Lambda^{0} Efficiency vs p_{T}", 70, 0., 20.);
+  lamEffVsEtaPt_denom_test = theDQMstore->make<TH2D>("LamEffVsEtaPt_denom_test",
                            "#Lambda^{0} Efficiency vs #eta and p_{T}", etaBins.size()-1, &etaBins[0], ptBins.size()-1, &ptBins[0]);
 
   ksFakeVsR_num = theDQMstore->make<TH1D>("K0sFakeVsR_num",
@@ -136,6 +157,12 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			     "K^{0}_{S} Fake Rate vs #eta", 40, -2.5, 2.5);
   ksFakeVsPt_num = theDQMstore->make<TH1D>("K0sFakeVsPt_num",
 			    "K^{0}_{S} Fake Rate vs p_{T}", 70, 0., 20.);
+  ksSecVsR_num = theDQMstore->make<TH1D>("K0sSecVsR_num",
+                           "K^{0}_{S} Secondary Rate vs #rho", 40, 0., 40.);
+  ksSecVsEta_num = theDQMstore->make<TH1D>("K0sSecVsEta_num",
+                             "K^{0}_{S} Secondary Rate vs #eta", 40, -2.5, 2.5);
+  ksSecVsPt_num = theDQMstore->make<TH1D>("K0sSecVsPt_num",
+                            "K^{0}_{S} Secondary Rate vs p_{T}", 70, 0., 20.);
   ksTkFakeVsR_num = theDQMstore->make<TH1D>("K0sTkFakeVsR_num",
 			   "K^{0}_{S} Tracking Fake Rate vs #rho", 40, 0., 40.);
   ksTkFakeVsEta_num = theDQMstore->make<TH1D>("K0sTkFakeVsEta_num",
@@ -156,6 +183,18 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 			      "#Lambda^{0} Fake Rate vs #eta", 40, -2.5, 2.5);
   lamFakeVsPt_num = theDQMstore->make<TH1D>("LamFakeVsPt_num",
 			     "#Lambda^{0} Fake Rate vs p_{T}", 70, 0., 20.);
+  lamCascadeVsR_num = theDQMstore->make<TH1D>("LamCascadeVsR_num",
+                            "#Lambda^{0} cascade Rate vs #rho", 40, 0., 40.);
+  lamCascadeVsEta_num = theDQMstore->make<TH1D>("LamCascadeVsEta_num", 
+                              "#Lambda^{0} cascade Rate vs #eta", 40, -2.5, 2.5);
+  lamCascadeVsPt_num = theDQMstore->make<TH1D>("LamCascadeVsPt_num",
+                             "#Lambda^{0} cascade Rate vs p_{T}", 70, 0., 20.);
+  lamSecVsR_num = theDQMstore->make<TH1D>("LamSecVsR_num",
+                            "#Lambda^{0} Secondary Rate vs #rho", 40, 0., 40.);
+  lamSecVsEta_num = theDQMstore->make<TH1D>("LamSecVsEta_num",
+                              "#Lambda^{0} Secondary Rate vs #eta", 40, -2.5, 2.5);
+  lamSecVsPt_num = theDQMstore->make<TH1D>("LamSecVsPt_num",
+                             "#Lambda^{0} Secondary Rate vs p_{T}", 70, 0., 20.);
   lamTkFakeVsR_num = theDQMstore->make<TH1D>("LamTkFakeVsR_num",
 			    "#Lambda^{0} Tracking Fake Rate vs #rho", 40, 0., 40.);
   lamTkFakeVsEta_num = theDQMstore->make<TH1D>("LamTkFakeVsEta_num",
@@ -196,10 +235,10 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
 
   ksCandStatus = theDQMstore->make<TH1D>("ksCandStatus",
 			  "Fake type by cand status",
-			  10, 0., 10.);
-  lamCandStatus = theDQMstore->make<TH1D>("ksCandStatus",
+			  30, 0., 30.);
+  lamCandStatus = theDQMstore->make<TH1D>("lamCandStatus",
 			  "Fake type by cand status",
-			  10, 0., 10.);
+			  30, 0., 30.);
 
   double minKsMass = 0.49767 - 0.2;
   double maxKsMass = 0.49767 + 0.2;
@@ -292,6 +331,13 @@ void V0Validator::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup) 
   lamFakeDauRadDist = theDQMstore->make<TH1D>("radDistFakeLam",
 				    "Production radius of daughter particle of Lam fake",
 				    100, 0., 15.);
+
+  ksResolutionPt = theDQMstore->make<TH2D>("ksResolutionPt",
+                                    "K0s pT resolution",
+                                    100, 0, 10.0, 100, -0.5, 0.5); 
+  lamResolutionPt = theDQMstore->make<TH2D>("lamResolutionPt",
+                                    "Lambda pT resolution",
+                                    100, 0, 10.0, 100, -0.5, 0.5); 
 }
 
 void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -326,7 +372,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //////////////////////////////////
 
   edm::Handle<reco::GenParticleCollection> genParticleCollection;
-  iEvent.getByLabel("genParticles",genParticleCollection);
+  iEvent.getByLabel(genParticleCollectionTag, genParticleCollection);
   for(unsigned it=0; it<genParticleCollection->size(); ++it) {
 
     const reco::GenParticle & genCand = (*genParticleCollection)[it];
@@ -347,7 +393,8 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           mid = mom1->pdgId();
         }
       }
-      if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) continue;
+      if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {continue;}
+//cout<<genCand.status()<<endl;
       lamGenVsEtaPt->Fill(eta,pt);
     }
   }
@@ -533,14 +580,17 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
 			 iTP != parentVertex->sourceTracks_end(); iTP++) {
 		      if( fabs((*iTP)->pdgId()) == 310 ) {
-			K0sCandStatus = 1;
-			realK0sFound++;
-			numK0sFound += 1.;
-			std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
-			// Pushing back a good V0
-			trueK0s.push_back(pair);
-			trueKsMasses.push_back(mass);
-                        trueKsPt.push_back(K0sCandpT);
+                        if( (*iTP)->status() != 1 ) K0sCandStatus=20;
+                        else {
+			  K0sCandStatus = 1;
+	  		  realK0sFound++;
+			  numK0sFound += 1.;
+			  std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
+			  // Pushing back a good V0
+			  trueK0s.push_back(pair);
+			  trueKsMasses.push_back(mass);
+                          trueKsPt.push_back(K0sCandpT);
+                        }
 		      }
 		      else {
 			K0sCandStatus = 2;
@@ -578,7 +628,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
       theDaughterTracks.clear();
       // fill the fake rate histograms
-      if( K0sCandStatus > 1 ) {
+      if( K0sCandStatus > 1 && K0sCandStatus!=20 ) {
 	ksFakeVsR_num->Fill(K0sCandR);
 	ksFakeVsEta_num->Fill(K0sCandEta);
 	ksFakeVsPt_num->Fill(K0sCandpT);
@@ -593,6 +643,11 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	ksTkFakeVsR_num->Fill(K0sCandR);
 	ksTkFakeVsEta_num->Fill(K0sCandEta);
 	ksTkFakeVsPt_num->Fill(K0sCandpT);
+      }
+      if( K0sCandStatus == 20 ) {
+        ksSecVsR_num->Fill(K0sCandR);
+        ksSecVsEta_num->Fill(K0sCandEta);
+        ksSecVsPt_num->Fill(K0sCandpT);
       }
       ksFakeVsR_denom->Fill(K0sCandR);
       ksFakeVsEta_denom->Fill(K0sCandEta);
@@ -663,14 +718,22 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
 			 iTP != parentVertex->sourceTracks_end(); ++iTP) {
 		      if( fabs((*iTP)->pdgId()) == 3122 ) {
-                        if((*iTP)->parentVertex().isNonnull() && (*iTP)->parentVertex()->nSourceTracks()!= 0) {
-                          TrackingVertex::tp_iterator genmother = (*iTP)->parentVertex()->sourceTracks_begin();
+                        for( TrackingVertex::tp_iterator genmother = (*iTP)->parentVertex()->sourceTracks_begin();
+                                              genmother != (*iTP)->parentVertex()->sourceTracks_end(); genmother++) {
                           double mid = (*genmother)->pdgId();
-                          if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) LamCandStatus=10;
+                          if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {LamCandStatus=10; break;}
+                          for( TrackingVertex::tp_iterator genmother1 = (*genmother)->parentVertex()->sourceTracks_begin();
+                                               genmother1 != (*genmother)->parentVertex()->sourceTracks_end(); genmother1++) {
+                            mid = (*genmother1)->pdgId();
+                            if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {LamCandStatus=10; break;}
+                          }
                         } 
-                        else {
-	  		  LamCandStatus = 1;
-		  	  realLamFound++;
+cout<<LamCandStatus<<endl;
+                        if(LamCandStatus != 10 && (*iTP)->status()!=1) LamCandStatus=20; 
+                        if(LamCandStatus != 10 && LamCandStatus != 20 ) 
+                        {
+	  	          LamCandStatus = 1;
+		          realLamFound++;
 			  numLamFound += 1.;
 		  	  std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
 		 	  // Pushing back a good V0
@@ -715,7 +778,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       }
       theDaughterTracks.clear();
       // fill the fake rate histograms
-      if( LamCandStatus > 1 ) {
+      if( LamCandStatus > 1 && LamCandStatus!=10) {
 	lamFakeVsR_num->Fill(LamCandR);
 	lamFakeVsEta_num->Fill(LamCandEta);
 	lamFakeVsPt_num->Fill(LamCandpT);
@@ -726,7 +789,17 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	  lamFakeDauRadDist->Fill(radDist[ndx]);
 	}
       }
-      if( K0sCandStatus == 5 ) {
+      if( LamCandStatus == 10 ) {
+        lamCascadeVsR_num->Fill(LamCandR);
+        lamCascadeVsEta_num->Fill(LamCandEta);
+        lamCascadeVsPt_num->Fill(LamCandpT);
+      }
+      if( LamCandStatus == 20 ) {
+        lamSecVsR_num->Fill(LamCandR);
+        lamSecVsEta_num->Fill(LamCandEta);
+        lamSecVsPt_num->Fill(LamCandpT);
+      }
+      if( LamCandStatus == 5 ) {
 	lamTkFakeVsR_num->Fill(LamCandR);
 	lamTkFakeVsEta_num->Fill(LamCandEta);
 	lamTkFakeVsPt_num->Fill(LamCandpT);
@@ -739,6 +812,36 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   nLam->Fill( (double) numLamFound );
   numLamFound = 0.;
 
+// test
+
+  for(TrackingParticleCollection::size_type i = 0; i < tPCeff.size(); i++) {
+    TrackingParticleRef tpr1(TPCollectionEff, i);
+    TrackingParticle* itp1 = const_cast<TrackingParticle*>(tpr1.get());
+    if(fabs(itp1->pdgId()) == 3122)
+    {
+      int status = itp1->status();
+      bool isSecLam=0;
+      for( TrackingVertex::tp_iterator genmother = itp1->parentVertex()->sourceTracks_begin();
+                         genmother != itp1->parentVertex()->sourceTracks_end(); genmother++) {
+        double mid = (*genmother)->pdgId();
+        if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {isSecLam=1; break;}
+        for( TrackingVertex::tp_iterator genmother1 = (*genmother)->parentVertex()->sourceTracks_begin();
+                         genmother1 != (*genmother)->parentVertex()->sourceTracks_end(); genmother1++) {
+          mid = (*genmother1)->pdgId();
+          if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {isSecLam=1; break;}
+        }   
+      }
+      if(isSecLam) continue;
+      if(itp1->status()!=1) continue;
+ 
+      if(!itp1->decayVertices().size()) continue;
+
+      double LamGenpTtmp = sqrt(itp1->momentum().perp2());
+      double LamGenEtatmp = itp1->momentum().eta();
+      lamEffVsEtaPt_denom_test->Fill(LamGenEtatmp,LamGenpTtmp);
+      lamEffVsPt_denom_test->Fill(LamGenpTtmp);
+    }
+  }
 
   ///////////////////////////////
   // Do efficiency calculation //
@@ -751,9 +854,11 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     TrackingParticleRef tpr1(TPCollectionEff, i);
     TrackingParticle* itp1 = const_cast<TrackingParticle*>(tpr1.get());
     if( (itp1->pdgId() == 211 || itp1->pdgId() == 2212)
-	&& itp1->parentVertex().isNonnull()
-	&& fabs(itp1->momentum().eta()) < 2.4
-	&& sqrt( itp1->momentum().perp2() ) > 0.2) {
+//	&& itp1->parentVertex().isNonnull()
+//	&& fabs(itp1->momentum().eta()) < 2.4
+//	&& sqrt( itp1->momentum().perp2() ) > 0.0) {
+    ) {
+      int nhits1 = itp1->trackPSimHit().size();
       bool isLambda = false;
       if( itp1->pdgId() == 2212 ) isLambda = true;
       if( itp1->parentVertex()->nDaughterTracks() == 2 ) {
@@ -772,10 +877,13 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	      if (isLambda) particle2pdgId = -211;
 	      else particle2pdgId = -2212;
 	      if( itp2->pdgId() == particle2pdgId
-		  && itp2->parentVertex().isNonnull()
-		  && fabs(itp2->momentum().eta()) < 2.4
-		  && sqrt(itp2->momentum().perp2()) > 0.2) {
+   	//	  && itp2->parentVertex().isNonnull()
+	//	  && fabs(itp2->momentum().eta()) < 2.4
+	//	  && sqrt(itp2->momentum().perp2()) > 0.0) {
+              ) {
 		if(itp2->parentVertex() == itp1->parentVertex()) {
+                  int nhits2 = itp2->trackPSimHit().size();
+
 		  // Found a good pair of Lambda daughters
 		  TrackingVertexRef piCand2Vertex = itp2->parentVertex();
 		  for (TrackingVertex::tp_iterator iTP2 = piCand2Vertex->sourceTracks_begin();
@@ -788,9 +896,9 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			ifill++) {
 		      // do nothing?
 		    }
-		    if( fabs((*iTP2)->pdgId()) == 3122 ) {
+		    if( fabs((*iTP2)->pdgId()) == 3122 && (*iTP2)->status()==1 ) {
 		      // found generated Lambda
-		      
+		     //cout<<nhits1<<" " <<nhits2<<endl;
 		      LamGenpT = sqrt((*iTP2)->momentum().perp2());
 		      LamGenEta = (*iTP2)->momentum().eta();
 		      LamGenR = sqrt(itp2->vertex().perp2());
@@ -808,6 +916,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			    //cout << "Maybe it's here.." << endl;
 			    goodLamMass->Fill(trueLamMasses[loop_1]);
                             goodLamMassPt->Fill(trueLamPt[loop_1],trueLamMasses[loop_1]);
+                            lamResolutionPt->Fill(trueLamPt[loop_1],LamGenpT-trueLamPt[loop_1]);
 			    break;
 			  }
 			  else {
@@ -860,14 +969,18 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		      }
 		      //cout << "LamGenStatus: " << LamGenStatus << ", LamPiEff[i]: " << LamPiEff[0] << ", " << LamPiEff[1] << endl;
 		      // Fill histograms
-		      if(LamGenR > 0.) {
+		      if(LamGenR > 0. && fabs(LamGenEta) > 0. && LamGenpT > 0.) {
 			if(LamGenStatus == 1) {
 			  lamEffVsR_num->Fill(LamGenR);
+                          lamEffVsEtaR_num->Fill(LamGenR,LamGenEta);
+                          lamEffVsPtR_num->Fill(LamGenR,LamGenpT);
 			}
 			if((double) LamGenStatus < 2.5) {
 			  lamTkEffVsR_num->Fill(LamGenR);
 			}
 			lamEffVsR_denom->Fill(LamGenR);
+                        lamEffVsEtaR_denom->Fill(LamGenR,LamGenEta);
+                        lamEffVsPtR_denom->Fill(LamGenR,LamGenpT);
 		      }
 		      if(fabs(LamGenEta) > 0. && LamGenpT > 0.) {
 			if(LamGenStatus == 1) {
@@ -880,6 +993,8 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                           lamTkEffVsPt_num->Fill(LamGenpT);
                           lamTkEffVsEtaPt_num->Fill(LamGenEta,LamGenpT);
 			}
+                     //cout<<nhits1<<" " <<nhits2<<endl;
+
 			lamEffVsEta_denom->Fill(LamGenEta);
                         lamEffVsPt_denom->Fill(LamGenpT);
                         lamEffVsEtaPt_denom->Fill(LamGenEta,LamGenpT);
@@ -903,9 +1018,10 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     TrackingParticle* itp1=const_cast<TrackingParticle*>(tpr1.get());
     // only count the efficiency for pions with |eta|<2.4 and pT>0.2 GeV. First search for a suitable pi+
     if ( itp1->pdgId() == 211 
-	 && itp1->parentVertex().isNonnull() 
-	 && fabs(itp1->momentum().eta()) < 2.4 
-	 && sqrt(itp1->momentum().perp2()) > 0.2) {
+//	 && itp1->parentVertex().isNonnull() 
+//	 && fabs(itp1->momentum().eta()) < 2.4 
+//	 && sqrt(itp1->momentum().perp2()) > 0.0) {
+    ){
       if ( itp1->parentVertex()->nDaughterTracks() == 2 ) {
 	TrackingVertexRef piCand1Vertex = itp1->parentVertex();	       
 	//check trackingParticle pion for a Ks mother
@@ -917,9 +1033,11 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	    for (TrackingParticleCollection::size_type j=0; j<tPCeff.size(); j++){
 	      TrackingParticleRef tpr2(TPCollectionEff, j);
 	      TrackingParticle* itp2=const_cast<TrackingParticle*>(tpr2.get());
-	      if ( itp2->pdgId() == -211 && itp2->parentVertex().isNonnull()  
-		   && fabs(itp2->momentum().eta()) < 2.4 
-		   && sqrt(itp2->momentum().perp2()) > 0.2) {
+	      if ( itp2->pdgId() == -211
+//                   && itp2->parentVertex().isNonnull()  
+//		   && fabs(itp2->momentum().eta()) < 2.4 
+//		   && sqrt(itp2->momentum().perp2()) > 0.0) {
+              ) {
 		//check the pi+ and pi- have the same vertex
 		if ( itp2->parentVertex() == itp1->parentVertex() ) {
 		  TrackingVertexRef piCand2Vertex = itp2->parentVertex();	       
@@ -928,7 +1046,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 		    //iTP2 is a TrackingParticle
 		    K0sGenEta = K0sGenpT = K0sGenR = 0.;
 		    K0sGenStatus = 0;
-		    if( (*iTP2)->pdgId() == 310 ) {
+		    if( (*iTP2)->pdgId() == 310 && (*iTP2)->status() == 1 ) {
 		      K0sGenpT = sqrt( (*iTP2)->momentum().perp2() );
 		      K0sGenEta = (*iTP2)->momentum().eta();
 		      K0sGenR = sqrt(itp2->vertex().perp2());
@@ -947,6 +1065,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			    K0sGenStatus = 1;
 			    goodKsMass->Fill(trueKsMasses[loop_2]);
                             goodKsMassPt->Fill(trueKsPt[loop_2],trueKsMasses[loop_2]);
+                            ksResolutionPt->Fill(trueKsPt[loop_2],K0sGenpT-trueKsPt[loop_2]);
 			    break;
 			  }
 			  else {
@@ -1005,14 +1124,18 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 			k0sTracksFound++;
 		      }
 		      //Fill Histograms
-		      if(K0sGenR > 0.) {
+		      if(K0sGenR > 0. && fabs(K0sGenEta) > 0. && K0sGenpT > 0.) {
 			if(K0sGenStatus == 1) {
 			  ksEffVsR_num->Fill(K0sGenR);
+                          ksEffVsEtaR_num->Fill(K0sGenR,K0sGenEta);
+                          ksEffVsPtR_num->Fill(K0sGenR,K0sGenpT);
 			}
 			if((double) K0sGenStatus < 2.5) {			  
 			  ksTkEffVsR_num->Fill(K0sGenR);
 			}
 			ksEffVsR_denom->Fill(K0sGenR);
+                        ksEffVsEtaR_denom->Fill(K0sGenR,K0sGenEta);
+                        ksEffVsPtR_denom->Fill(K0sGenR,K0sGenpT);
 		      }
 
 		      if(fabs(K0sGenEta) > 0. && K0sGenpT > 0.) {
