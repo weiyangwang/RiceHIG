@@ -60,6 +60,10 @@ process.v0Validator.isMergedTruth = cms.bool(True)
 
 process.selectV0CandidatesNewlambda.v0CollName = cms.string("generalV0CandidatesNew")
 process.selectV0CandidatesNewkshort.v0CollName = cms.string("generalV0CandidatesNew")
+process.selectV0CandidatesNewlambda.cosThetaCut = cms.double(0.9999)
+process.selectV0CandidatesNewlambda.decayLSigCut = cms.double(7.5)
+process.selectV0CandidatesNewkshort.cosThetaCut = cms.double(0.9999)
+process.selectV0CandidatesNewkshort.decayLSigCut = cms.double(7.5)
 
 process.options = cms.untracked.PSet(
     wantSummary = cms.untracked.bool(True)
