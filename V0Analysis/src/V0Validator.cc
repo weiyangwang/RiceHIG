@@ -1,4 +1,3 @@
-
 //
 // Package:    V0Validator
 // Class:      V0Validator
@@ -34,9 +33,9 @@ const double protonMassSquared = protonMass*protonMass;
 V0Validator::V0Validator(const edm::ParameterSet& iConfig) : 
   trackCollectionTag(iConfig.getParameter<edm::InputTag>("trackCollection")),
   vertexCollectionTag(iConfig.getParameter<edm::InputTag>("vertexCollection")),
+  genParticleCollectionTag(iConfig.getParameter<edm::InputTag>("genParticleCollection")),
   k0sCollectionTag(iConfig.getParameter<edm::InputTag>("kShortCollection")),
   lamCollectionTag(iConfig.getParameter<edm::InputTag>("lambdaCollection")),
-  genParticleCollectionTag(iConfig.getParameter<edm::InputTag>("genParticleCollection")),
   isMatchByHitsOrChi2_(iConfig.getParameter<bool>("isMatchByHitsOrChi2")),
   isMergedTruth_(iConfig.getParameter<bool>("isMergedTruth"))
 {
@@ -373,6 +372,7 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   edm::Handle<reco::GenParticleCollection> genParticleCollection;
   iEvent.getByLabel(genParticleCollectionTag, genParticleCollection);
+
   for(unsigned it=0; it<genParticleCollection->size(); ++it) {
 
     const reco::GenParticle & genCand = (*genParticleCollection)[it];
@@ -394,7 +394,6 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         }
       }
       if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {continue;}
-//cout<<genCand.status()<<endl;
       lamGenVsEtaPt->Fill(eta,pt);
     }
   }
@@ -575,12 +574,28 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             	    if( parentVertex->nSourceTracks() == 0 ) {
                       // No source tracks found for K0s vertex; shouldn't happen, but does for evtGen events
                       K0sCandStatus = 6;
+                      if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
+                        K0sCandStatus = 1;
+                        realK0sFound++;
+                        numK0sFound += 1.;
+                        std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
+                        // Pushing back a good V0
+                        trueK0s.push_back(pair);
+                        trueKsMasses.push_back(mass);
+                        trueKsPt.push_back(K0sCandpT);
+                      } 
+                      else {
+                        K0sCandStatus = 2;
+                        if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212)) {
+                          K0sCandStatus = 7;
+                        }
+                      }
                     }
 //		    if( fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 211 ) {
 		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
 			 iTP != parentVertex->sourceTracks_end(); iTP++) {
 		      if( fabs((*iTP)->pdgId()) == 310 ) {
-                        if( (*iTP)->status() != 1 ) K0sCandStatus=20;
+                        if( (*iTP)->status() == -99 ) K0sCandStatus=20;
                         else {
 			  K0sCandStatus = 1;
 	  		  realK0sFound++;
@@ -713,6 +728,16 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                     if( parentVertex->nSourceTracks() == 0 ) {
                       // No source tracks found for Lam vertex; shouldn't happen, but does for evtGen events
                       LamCandStatus = 6;
+                      if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) ) {
+                        LamCandStatus = 1;
+                        realLamFound++;
+                        numLamFound += 1.;
+                        std::pair<TrackingParticleRef, TrackingParticleRef> pair(firstDauTP, tpref);
+                        // Pushing back a good V0
+                        trueLams.push_back(pair);
+                        trueLamMasses.push_back(mass);
+                        trueLamPt.push_back(LamCandpT);
+                      }
                     }
 //		    if((fabs(firstDauTP->pdgId()) == 2212 && fabs(tpref->pdgId()) == 211) || (fabs(firstDauTP->pdgId()) == 211 && fabs(tpref->pdgId()) == 2212) ) {
 		    for( TrackingVertex::tp_iterator iTP = parentVertex->sourceTracks_begin();
@@ -728,8 +753,8 @@ void V0Validator::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
                             if(fabs(mid)==3322 || fabs(mid)==3312 || fabs(mid)==3324 || fabs(mid)==3314 || fabs(mid)==3334) {LamCandStatus=10; break;}
                           }
                         } 
-cout<<LamCandStatus<<endl;
-                        if(LamCandStatus != 10 && (*iTP)->status()!=1) LamCandStatus=20; 
+
+                        if(LamCandStatus != 10 && (*iTP)->status() == -99) LamCandStatus=20; 
                         if(LamCandStatus != 10 && LamCandStatus != 20 ) 
                         {
 	  	          LamCandStatus = 1;
@@ -832,7 +857,7 @@ cout<<LamCandStatus<<endl;
         }   
       }
       if(isSecLam) continue;
-      if(itp1->status()!=1) continue;
+      if(itp1->status() == -99) continue;
  
       if(!itp1->decayVertices().size()) continue;
 
@@ -896,9 +921,8 @@ cout<<LamCandStatus<<endl;
 			ifill++) {
 		      // do nothing?
 		    }
-		    if( fabs((*iTP2)->pdgId()) == 3122 && (*iTP2)->status()==1 ) {
+		    if( fabs((*iTP2)->pdgId()) == 3122 && (*iTP2)->status()!=-99 ) {
 		      // found generated Lambda
-		     //cout<<nhits1<<" " <<nhits2<<endl;
 		      LamGenpT = sqrt((*iTP2)->momentum().perp2());
 		      LamGenEta = (*iTP2)->momentum().eta();
 		      LamGenR = sqrt(itp2->vertex().perp2());
@@ -1011,7 +1035,6 @@ cout<<LamCandStatus<<endl;
   }
 
   //Kshorts
-
   // cout << "Starting Kshort efficiency" << endl;
   for (TrackingParticleCollection::size_type i=0; i<tPCeff.size(); i++){
     TrackingParticleRef tpr1(TPCollectionEff, i);
@@ -1046,7 +1069,7 @@ cout<<LamCandStatus<<endl;
 		    //iTP2 is a TrackingParticle
 		    K0sGenEta = K0sGenpT = K0sGenR = 0.;
 		    K0sGenStatus = 0;
-		    if( (*iTP2)->pdgId() == 310 && (*iTP2)->status() == 1 ) {
+		    if( (*iTP2)->pdgId() == 310 && (*iTP2)->status() != -99 ) {
 		      K0sGenpT = sqrt( (*iTP2)->momentum().perp2() );
 		      K0sGenEta = (*iTP2)->momentum().eta();
 		      K0sGenR = sqrt(itp2->vertex().perp2());
@@ -1172,3 +1195,4 @@ void V0Validator::endRun(const edm::Run& iRun, const edm::EventSetup& iSetup) {}
 
 //define this as a plug-in
 //DEFINE_FWK_MODULE(V0Validator);
+
