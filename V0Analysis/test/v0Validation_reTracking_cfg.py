@@ -23,7 +23,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = 'STARTHI53_V17::All'
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(-1)
 )
 
 process.source = cms.Source("PoolSource",
@@ -34,13 +34,13 @@ process.source = cms.Source("PoolSource",
 #'root://xrootd1.cmsaf.mit.edu//store/user/vzhukova/HIJING_GEN-SIM_YUE-SHI_Minbias_2_v1/HIJING_RECO_YUE-SHI_Minbias__2_v1/b7d33bba7673cdb1ee6f4983c0800c79/hijing_reco_fix_4_2_RU0.root'
 #'root://xrootd1.cmsaf.mit.edu//store/himc/HiWinter13/Hijing_PPb502_MinimumBias/GEN-SIM-RECO/pa_STARTHI53_V25-v1/30000/64B44ED9-EF77-E211-825A-00266CF97FF4.root'
                 ),
-          dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
-          inputCommands=cms.untracked.vstring(
-                  'keep *',
-                  'drop *_*generalTracks*_*_*',
-                  'drop *_*offlinePrimaryVertices*_*_*'
-          )
-                            )
+#          dropDescendantsOfDroppedBranches=cms.untracked.bool(False),
+#          inputCommands=cms.untracked.vstring(
+#                  'keep *',
+#                  'drop *_*generalTracks*_*_*',
+#                  'drop *_*offlinePrimaryVertices*_*_*'
+#          )
+)
 
 ### validation-specific includes
 process.load("SimTracker.TrackAssociation.TrackAssociatorByHits_cfi")
@@ -58,19 +58,26 @@ process.generalV0CandidatesNew = process.generalV0Candidates.clone (
     xiVtxSignificance3DCut = cms.double(0.0),
     xiVtxSignificance2DCut = cms.double(0.0),
     vtxSignificance2DCut = cms.double(0.0),
-    vtxSignificance3DCut = cms.double(3.0)
+    vtxSignificance3DCut = cms.double(0.0)
 )   
 
-process.detachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.1
-process.detachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 1.5
-process.detachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 15.0
+process.initialStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 0.2
+process.detachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.075
+process.detachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.originRadius = 2.0
+process.detachedTripletStepSeeds.RegionFactoryPSet.RegionPSet.originHalfLength = 20.0
 process.lowPtTripletStepSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.075
-process.mixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.ptMin = 0.15
-process.mixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.ptMin = 0.25
-process.pixelLessStepSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.3
+process.mixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.ptMin = 0.1
+process.mixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.originRadius = 2.0
+process.mixedTripletStepSeedsA.RegionFactoryPSet.RegionPSet.originHalfLength = 20.0
+process.mixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.ptMin = 0.2
+process.mixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.originRadius = 2.0
+process.mixedTripletStepSeedsB.RegionFactoryPSet.RegionPSet.originHalfLength = 20.0
+process.pixelLessStepSeeds.RegionFactoryPSet.RegionPSet.ptMin = 0.2
 
 process.v0Validator.kShortCollection = cms.InputTag('selectV0CandidatesNewkshort:Kshort')
 process.v0Validator.lambdaCollection = cms.InputTag('selectV0CandidatesNewlambda:Lambda')
+#process.v0Validator.kShortCollection = cms.InputTag('selectV0CandidatesNew:Kshort')
+#process.v0Validator.lambdaCollection = cms.InputTag('selectV0CandidatesNew:Lambda')
 process.v0Validator.isMatchByHitsOrChi2 = cms.bool(True)
 process.v0Validator.isMergedTruth = cms.bool(True)
 
@@ -96,5 +103,5 @@ process.v0validation = cms.Sequence(process.generalV0CandidatesNew*process.selec
 process.extra_reco = cms.Path(process.ppTrackReco)
 process.p = cms.Path(process.v0validation)
 
-process.schedule = cms.Schedule(process.extra_reco,process.p)
-#process.schedule = cms.Schedule(process.p)
+#process.schedule = cms.Schedule(process.extra_reco,process.p)
+process.schedule = cms.Schedule(process.p)
