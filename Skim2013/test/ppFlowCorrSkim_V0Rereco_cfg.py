@@ -9,19 +9,19 @@ process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-process.load('HeavyIonsAnalysis.Configuration.collisionEventSelection_cff')
 process.load('Configuration.EventContent.EventContentHeavyIons_cff')
 
 process.source = cms.Source("PoolSource",
    fileNames = cms.untracked.vstring(
-'root://xrootd2.cmsaf.mit.edu//store/results/heavy-ions/MinimumBias/StoreResults-PP2010A_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_minbias/MinimumBias/USER/StoreResults-PP2010A_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_minbias/0000/38A9025B-853E-E211-A433-90B11C0BCCA0.root'
+#'root://xrootd2.cmsaf.mit.edu//store/results/heavy-ions/MinimumBias/StoreResults-PP2010A_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_minbias/MinimumBias/USER/StoreResults-PP2010A_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_minbias/0000/38A9025B-853E-E211-A433-90B11C0BCCA0.root'
+'/store/results/heavy-ions/MinimumBias/StoreResults-PP2010A_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_minbias/MinimumBias/USER/StoreResults-PP2010A_Apr21ReReco_TRKANASKIM_HIGHMULT_v2-d3b00b9920e9d4ebdfcff6a3f8ddc689-ppGoodColl_minbias/0000/38A9025B-853E-E211-A433-90B11C0BCCA0.root'
 )
 )
 
 # =============== Other Statements =====================
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
-process.GlobalTag.globaltag = 'GR_P_V43F::All'
+process.GlobalTag.globaltag = 'GR_R_44_V10::All'
 
 ########## V0 candidate rereco ############################################################### 
 process.generalV0CandidatesNew = process.generalV0Candidates.clone (
