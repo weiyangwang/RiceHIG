@@ -1,0 +1,21 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_PPData_Trigger_2760GeV
+#export TRIGGERNAMES="HLT_PAPixelTracks_Multiplicity160_v1"
+
+export ISCORR=0
+export ISTRKQUALITY=0
+
+export PTTRGMINARRAY="0.1"
+export PTTRGMAXARRAY="10000.0"
+export PTASSMINARRAY="0.1"
+export PTASSMAXARRAY="10000.0"
+
+#export ETATRGMIN=-2.0
+#export ETATRGMAX=2.0
+#export ETAASSMIN=-2.0
+#export ETAASSMAX=2.0
+
+NMIN=(-1)
+NMAX=(-1)
+#NMIN=(0 35 90 110 120 150)
+#NMAX=(35 90 110 120 150 185)

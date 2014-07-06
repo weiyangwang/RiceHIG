@@ -1,0 +1,18 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_PAData_Trigger_5TeV
+export TRIGGERNAMES="HLT_PAPixelTracks_Multiplicity100_v1 HLT_PAPixelTracks_Multiplicity130_v1 HLT_PAPixelTracks_Multiplicity160_v1 HLT_PAPixelTracks_Multiplicity100_v2 HLT_PAPixelTracks_Multiplicity130_v2 HLT_PAPixelTracks_Multiplicity160_v2"
+
+#export PTTRGMINARRAY="0.3 0.5 0.75 1.0 1.5 2.0 2.5"
+#export PTTRGMAXARRAY="0.5 0.75 1.0 1.5 2.0 2.5 3.0"
+#export PTASSMINARRAY="0.3 0.5 0.75 1.0 1.5 2.0 2.5"
+#export PTASSMAXARRAY="0.5 0.75 1.0 1.5 2.0 2.5 3.0"
+
+export PTTRGMINARRAY="3.0"
+export PTTRGMAXARRAY="3.5"
+export PTASSMINARRAY="3.0"
+export PTASSMAXARRAY="3.5"
+
+export BKGFACTOR=1
+
+NMIN=(185)
+NMAX=(220)

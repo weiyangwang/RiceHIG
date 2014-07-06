@@ -1,0 +1,79 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE_HighMult
+export EVENTTYPE="EPOSReco_Minbias_5TeV"
+export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
+#export EFFHISTNAME="NULL"
+export GENPARTICLECOLLECTION="genParticles"
+#export CENTFILENAME="$CMSSW_BASE/src/RecoHI/HiCentralityAlgos/tools/centralityfile_ampt.root"
+#export CENTTABLENAME="HFhitsAMPT_2760GeV"
+
+export ISGENMULT=0
+export ISDOEVENTSHAPE=0
+export ISHIGENINFONTUPLE=0
+export ISVTXSEL=1
+
+export ZVTXCENTER=0.48
+export YVTXCENTER=0.40
+export XVTXCENTER=0.24
+export ZVTXMIN=-150
+export ZVTXMAX=150
+export ZVTXBIN=300
+export RHOMIN=0.0
+export RHOMAX=2.0
+export ETAMULTMIN=-2.4
+export ETAMULTMAX=2.4
+export PTMULTMIN=0.4
+export PTMULTMAX=10000.0
+
+export PTTRGMINARRAY="0.0"
+export PTTRGMAXARRAY="10.0"
+export PTASSMINARRAY="0.0"
+export PTASSMAXARRAY="10.0"
+#export PTTRGMINARRAY="0.3 0.5 1.0 1.5 2.0 2.5 3.0 4.0 5.0 6.0 8.0 10.0"
+#export PTTRGMAXARRAY="0.5 1.0 1.5 2.0 2.5 3.0 4.0 5.0 6.0 8.0 10.0 12.0"
+#export PTASSMINARRAY="0.3"
+#export PTASSMAXARRAY="3.0"
+
+#export ETATRGMIN=-1.0
+#export ETATRGMAX=1.0
+#export ETAASSMIN=-1.0
+#export ETAASSMAX=1.0
+export ETATRGMIN=0.0
+export ETATRGMAX=2.4
+export ETAASSMIN=-5.0
+export ETAASSMAX=-3.0
+
+export ISCORR=1
+export ISHI=0
+export ISHARMONICS=0
+#export ISLEADTRACK=1
+export ISPTWEIGHTTRG=0
+export ISPTWEIGHTASS=0
+export ISTRKQUALITY=1
+
+export ISFULLMATRIX=1
+
+#export PDGIDTRG=3122
+export ISSTABLETRG=1
+export ISCHARGETRG=1
+export TRGID="GenParticle"
+export ASSID="GenParticle"
+
+export TRGTRACKCOLLECTION="generalTracks"
+export ASSTRACKCOLLECTION="generalTracks"
+export VERTEXCOLLECTION="offlinePrimaryVertices"
+
+#NMIN=(0 5 10 15 20 25 30 40 50 60 70 80 0)
+#NMAX=(5 10 15 20 25 30 40 50 60 70 80 100 10)
+
+#NMIN=(0 2 5 7 10 15 20 25 30 35 40 0)
+#NMAX=(2 5 7 10 15 20 25 30 35 40 50 5)
+
+#NMIN=(0 80 100 120 150)
+#NMAX=(20 100 120 150 200)
+NMIN=(0 80)
+NMAX=(20 120)
+CENTMIN=(-1)
+CENTMAX=(-1)
+
+export BKGFACTOR=10

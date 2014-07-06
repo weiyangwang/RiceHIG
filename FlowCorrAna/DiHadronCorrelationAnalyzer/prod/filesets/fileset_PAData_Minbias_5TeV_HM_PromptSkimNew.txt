@@ -1,0 +1,16 @@
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_160_1_kyg.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_1_1_jUS.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_2_1_tRC.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_3_1_OLI.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_40_1_18T.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_4_1_SjV.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_55_1_yoZ.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_58_1_W2I.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_5_1_yrQ.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_62_1_I9i.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_63_1_Uru.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_6_1_6OG.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_88_1_MmX.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_8_1_TlD.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_90_1_dmP.root
+file:/mnt/hadoop/cms/store/user/davidlw/PAHighPt/PA2013_FlowCorr_PromptSkim_PURej2Sigma_v3/5044fac50d75acdd04581c0fc7727c77/pPb_HM_9_1_DgB.root

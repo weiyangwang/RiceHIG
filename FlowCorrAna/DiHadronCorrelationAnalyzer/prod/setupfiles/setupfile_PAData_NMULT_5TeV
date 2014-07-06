@@ -1,0 +1,33 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_PAData_Trigger_5TeV
+#export TRIGGERNAMES="HLT_PAPixelTracks_Multiplicity160_v1"
+
+export ZVTXBIN=300
+export ZVTXMIN=-150
+export ZVTXMAX=150
+
+export ISCORR=0
+export ISTRKQUALITY=0
+export ISINVMASS=0
+export ISEVENTENGINEER=1
+
+export PTTRGMINARRAY="2.0"
+export PTTRGMAXARRAY="10000.0"
+export PTASSMINARRAY="2.0"
+export PTASSMAXARRAY="10000.0"
+
+#export ETATRGMIN=-4.0
+#export ETATRGMAX=4.0
+#export ETAASSMIN=-4.0
+#export ETAASSMAX=4.0
+
+export MASSTRG=0.498
+export MASSASS=0.140
+
+export TRGID="Kshort"
+export ASSID="Track"
+
+NMIN=(-1)
+NMAX=(-1)
+#NMIN=(0 35 90 110 120 150)
+#NMAX=(35 90 110 120 150 185)

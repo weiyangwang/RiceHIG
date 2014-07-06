@@ -1,0 +1,31 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE_HighMult
+export EVENTTYPE="PythiaReco_Minbias_2760GeV"
+export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
+export EFFHISTNAME="NULL"
+
+export ISGENMULT=1
+export ISDOEVENTSHAPE=0
+export ISHIGENINFONTUPLE=0
+export ISVTXSEL=0
+export ZVTXBIN=300
+
+export PTTRGMINARRAY="130.0"
+export PTTRGMAXARRAY="10000"
+export PTASSMINARRAY="0"
+export PTASSMAXARRAY="100.0"
+export PTMULTMIN=0.4
+export PTMULTMAX=10000.0
+
+export ETATRGMIN=-2.4
+export ETATRGMAX=2.4
+export ETAASSMIN=-2.4
+export ETAASSMAX=2.4
+
+export TRGID="GenJet"
+export ASSID="GenParticle"
+
+export PDGID=310
+
+NMIN=(-1)
+NMAX=(-1)

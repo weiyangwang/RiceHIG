@@ -1,0 +1,66 @@
+#!/bin/sh
+source $CMSSW_BASE/src/FlowCorrAna/DiHadronCorrelationAnalyzer/prod/setupfiles/setupfile_BASE_HighMult
+export EVENTTYPE="AMPTGen_Minbias_2760GeV"
+export FILESETNAME="file:$FILESETDIR/fileset_${EVENTTYPE}_${TAG}.txt"
+#export EFFHISTNAME="NULL"
+export GENPARTICLECOLLECTION="hiGenParticles"
+
+export ISGENMULT=1
+export ISDOEVENTSHAPE=0
+export ISHIGENINFONTUPLE=0
+export ISVTXSEL=0
+
+export ZVTXCENTER=0.48
+export YVTXCENTER=0.40
+export XVTXCENTER=0.24
+export ZVTXMIN=-150
+export ZVTXMAX=150
+export ZVTXBIN=300
+export RHOMIN=0.0
+export RHOMAX=2.0
+
+export PTMULTMIN=0.0
+export PTMULTMAX=10000.0
+export ETAMULTMIN=3.0
+export ETAMULTMAX=5.0
+
+export PTTRGMINARRAY="1.0"
+export PTTRGMAXARRAY="3.0"
+export PTASSMINARRAY="1.0"
+export PTASSMAXARRAY="3.0"
+
+export ETATRGMIN=-6.0
+export ETATRGMAX=6.0
+export ETAASSMIN=-6.0
+export ETAASSMAX=6.0
+
+export ISCORR=1
+export ISHI=0
+export ISHARMONICS=0
+export ISFULLMATRIX=1
+
+export ISSTABLETRG=1
+export ISCHARGETRG=1
+export ISSTABLEASS=1
+export ISCHARGEASS=1
+export TRGID="GenParticle"
+export ASSID="GenParticle"
+#export ISPTWEIGHTASS=1
+
+# 0-0.2%: 5937, inf
+# 0-5%: 4753, inf
+# 5-10%: 3975, 4753
+# 10-20%: 2809, 3975
+# 20-30%: 1968, 2809
+# 30-40%: 1344, 1968
+# 40-50%: 884, 1344
+# 50-60%: 550, 884
+
+NMIN=(550)
+NMAX=(884)
+#NMIN=(550 884 1344 1968 2809 3975 4753)
+#NMAX=(884 1344 1968 2809 3975 4753 10000)
+CENTMIN=(-1)
+CENTMAX=(-1)
+
+export BKGFACTOR=5
