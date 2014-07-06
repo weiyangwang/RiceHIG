@@ -28,6 +28,7 @@
 <use   name="DataFormats/Common"/>
 <use   name="DataFormats/Math"/>
 <use   name="DataFormats/HeavyIonEvent"/>
+<use   name="RecoHI/HiCentralityAlgos"/>
 <use   name="Geometry/Records"/>
 <use   name="Geometry/TrackerGeometryBuilder"/>
 <use   name="Geometry/CommonDetUnit"/>
