@@ -319,9 +319,9 @@ class DiHadronCorrelationMultiBaseFWLite{
    virtual void LoopV0Candidates(bool istrg, TString candtype);
    virtual void GetVertices();
    virtual void GetSimVertices();
-   virtual void FillHistsInvariantMass(const DiHadronCorrelationEvent& eventcorr);
-   virtual void AssignTrgPtBins(double pt, double eta, double phi, double charge, double effweight);
-   virtual void AssignAssPtBins(double pt, double eta, double phi, double charge, double effweight);
+//   virtual void FillHistsInvariantMass(const DiHadronCorrelationEvent& eventcorr);
+   virtual void AssignTrgPtBins(double pt, double eta, double phi, double mass, double charge, double effweight);
+   virtual void AssignAssPtBins(double pt, double eta, double phi, double mass, double charge, double effweight);
    virtual bool SelectTriggerBit();
    virtual double GetEventEngineer();
    virtual int  GetCentralityBin();

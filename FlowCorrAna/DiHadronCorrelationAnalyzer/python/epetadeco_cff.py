@@ -5,7 +5,11 @@ from FlowCorrAna.DiHadronCorrelationAnalyzer.epetadeco_cfi import *
 epetadeco_ana_HI_hfp = epetadeco_ana.clone(
   TrgTrackCollection = cms.string('hiLowPtPixelTracks'),
   VertexCollection = cms.string('hiSelectedVertex'),
-  GenParticleCollection = cms.string('hiGenParticles')
+  GenParticleCollection = cms.string('hiGenParticles'),
+
+  etaassmin = cms.double(3.0),
+  etaassmax = cms.double(3.5),
+  pttrgmin = cms.vdouble(0.3)
 )
 
 epetadeco_ana_HI_nocorr = epetadeco_ana_HI_hfp.clone(
@@ -15,8 +19,8 @@ epetadeco_ana_HI_nocorr = epetadeco_ana_HI_hfp.clone(
 )
 
 epetadeco_ana_HI_hfm = epetadeco_ana_HI_hfp.clone(
-  etaassmin = cms.double(-5.0),
-  etaassmax = cms.double(-4.0)
+  etaassmin = cms.double(-3.5),
+  etaassmax = cms.double(-3.0)
 )
 
 epetadeco_ana_HI_hfp_cent002 = epetadeco_ana_HI_hfp.clone(

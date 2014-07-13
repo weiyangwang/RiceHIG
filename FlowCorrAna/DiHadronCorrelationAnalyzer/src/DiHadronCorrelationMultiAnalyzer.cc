@@ -125,9 +125,7 @@ void DiHadronCorrelationMultiAnalyzer::endRun(const edm::Run& iRun, const edm::E
     if(mixend>eventcorrArray.size()) mixend=eventcorrArray.size();
     for(unsigned int j=mixstart;j<mixend;j++)
     {
-//      if(eventcorrArray[i].centbin != eventcorrArray[j].centbin) break;
-//      if(eventcorrArray[i].centbin != eventcorrArray[j].centbin) continue;
-
+      if(eventcorrArray[i].centbin != eventcorrArray[j].centbin) break;
       double deltazvtx = eventcorrArray[i].zvtx-eventcorrArray[j].zvtx;
       hDeltaZvtx->Fill(deltazvtx);
 
@@ -173,21 +171,6 @@ void DiHadronCorrelationMultiAnalyzer::NormalizeHists()
 //--------------- Calculate signal distributions ----------------------
 void DiHadronCorrelationMultiAnalyzer::FillHistsSignal(const DiHadronCorrelationEvent& eventcorr)
 {
-/*
-  for(unsigned int itrg=0;itrg<cutPara.pttrgmin.size();itrg++)
-  {
-    nMult_trg[itrg]=eventcorr.pVect_trg[itrg].size();
-    nMultCorr_trg[itrg]=0;
-    for(unsigned int ntrg=0;ntrg<nMult_trg[itrg];ntrg++) nMultCorr_trg[itrg] = nMultCorr_trg[itrg] + 1.0/(eventcorr.effVect_trg[itrg])[ntrg];
-  }
-
-  for(unsigned int jass=0;jass<cutPara.ptassmin.size();jass++)
-  {
-    nMult_ass[jass]=eventcorr.pVect_ass[jass].size();
-    nMultCorr_ass[jass]=0;
-    for(unsigned int nass=0;nass<nMult_ass[jass];nass++) nMultCorr_ass[jass] = nMultCorr_ass[jass] + 1.0/(eventcorr.effVect_ass[jass])[nass];
-  }
-*/
   for(unsigned int itrg=0;itrg<cutPara.pttrgmin.size();itrg++)
     for(unsigned int jass=0;jass<cutPara.ptassmin.size();jass++)
     {
@@ -204,8 +187,7 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsSignal(const DiHadronCorrelation
       double npairs_eta1eta2[16][16][5] = {{{0.0}}};
       for(unsigned int ntrg=0;ntrg<ntrgsize;ntrg++)
       {
-        TVector3 pvector_trg = (eventcorr.pVect_trg[itrg])[ntrg];	  
-        TLorentzVector part_trg(pvector_trg,sqrt(cutPara.mass_trg*cutPara.mass_trg+pvector_trg.Mag()*pvector_trg.Mag()));
+        TLorentzVector pvector_trg = (eventcorr.pVect_trg[itrg])[ntrg];	  
         double effweight_trg = (eventcorr.effVect_trg[itrg])[ntrg];
         double chg_trg = (eventcorr.chgVect_trg[itrg])[ntrg];
         double eta_trg = pvector_trg.Eta();
@@ -214,8 +196,7 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsSignal(const DiHadronCorrelation
 
         for(unsigned int nass=0;nass<nasssize;nass++)
         {
-          TVector3 pvector_ass = (eventcorr.pVect_ass[jass])[nass];   
-          TLorentzVector part_ass(pvector_ass,sqrt(cutPara.mass_ass*cutPara.mass_ass+pvector_ass.Mag()*pvector_ass.Mag()));
+          TLorentzVector pvector_ass = (eventcorr.pVect_ass[jass])[nass];   
           double effweight_ass = (eventcorr.effVect_ass[jass])[nass];
           double chg_ass = (eventcorr.chgVect_ass[jass])[nass];
           double eta_ass = pvector_ass.Eta();
@@ -233,18 +214,6 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsSignal(const DiHadronCorrelation
 //          if(fabs(deltaEta)<0.028 && fabs(deltaPhi)<0.02) continue; // two particles are close 
 //          if(fabs(deltaEta)<0.05 && fabs(deltaPhi)<0.05) continue; // two particles are close 
 
-/*
-          TLorentzVector part_total = part_ass + part_trg;
-          double massInv = part_total.M();
-          double openAngle = part_trg.Angle(part_ass.Vect());
-
-          if(cutPara.mass_trg==0 && cutPara.mass_ass==0 && openAngle>(0.22/part_total.Pt()-0.07/part_total.Pt()/part_total.Pt()) && openAngle<(0.65/part_total.Pt()-0.3/part_total.Pt()/part_total.Pt())) 
-          {
-            hInvMass_Signal->Fill(massInv);
-            hInvMassVsPt_Signal->Fill(part_total.Pt(),massInv);
-          }
-          hOpenAngleVsPt_Signal->Fill(part_total.Pt(),openAngle);
-*/
           // total weight
           double effweight = effweight_trg * effweight_ass;
 //          if(cutPara.IsPtWeightAss) effweight = effweight / (pt_ass-ptMean2_ass[jass]/ptMean_ass[jass]) / (pt_trg-ptMean2_trg[itrg]/ptMean_trg[itrg]);
@@ -252,7 +221,7 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsSignal(const DiHadronCorrelation
 //          if(cutPara.IsPtWeightTrg) effweight = effweight / pt_trg;
 
           // Direct calculation of Fourier harmonics for pairs
-          if(cutPara.IsHarmonics)// && fabs(deltaEta)>2) 
+          if(cutPara.IsHarmonics && fabs(deltaEta)>2) 
           {
             for(int nn = 0; nn<5; nn++)
             {
@@ -348,8 +317,7 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsBackground(const DiHadronCorrela
       double npairs_eta1eta2[16][16][5] = {{{0.0}}};
       for(unsigned int ntrg=0;ntrg<ntrgsize;ntrg++)
       {
-        TVector3 pvector_trg = (eventcorr_trg.pVect_trg[itrg])[ntrg];	  
-        TLorentzVector part_trg(pvector_trg,sqrt(cutPara.mass_trg*cutPara.mass_trg+pvector_trg.Mag()*pvector_trg.Mag()));
+        TLorentzVector pvector_trg = (eventcorr_trg.pVect_trg[itrg])[ntrg];	  
         double effweight_trg = (eventcorr_trg.effVect_trg[itrg])[ntrg];
         double chg_trg = (eventcorr_trg.chgVect_trg[itrg])[ntrg];
         double eta_trg = pvector_trg.Eta();
@@ -358,8 +326,7 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsBackground(const DiHadronCorrela
 
         for(unsigned int nass=0;nass<nasssize;nass++)
         {
-          TVector3 pvector_ass = (eventcorr_ass.pVect_ass[jass])[nass];   
-          TLorentzVector part_ass(pvector_ass,sqrt(cutPara.mass_ass*cutPara.mass_ass+pvector_ass.Mag()*pvector_ass.Mag()));
+          TLorentzVector pvector_ass = (eventcorr_ass.pVect_ass[jass])[nass];   
           double effweight_ass = (eventcorr_ass.effVect_ass[jass])[nass];
           double chg_ass = (eventcorr_ass.chgVect_ass[jass])[nass];
           double eta_ass = pvector_ass.Eta();
@@ -373,22 +340,8 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsBackground(const DiHadronCorrela
           double deltaPhi=GetDeltaPhi(phi_trg,phi_ass);
           double deltaEta=GetDeltaEta(eta_trg,eta_ass);
 
-//          if(fabs(deltaEta)<0.05 && fabs(deltaPhi)<0.05) continue; // two particles are close 
+          if(deltaEta==0.0 && deltaPhi==0.0 && pt_trg==pt_ass) continue; // two particles are identical
 //          if(fabs(deltaEta)<0.028 && fabs(deltaPhi)<0.02) continue; // two particles are close 
-//          if(deltaEta==0.0 && deltaPhi==0.0) continue; // two particles are close 
-
-/*
-          TLorentzVector part_total = part_ass + part_trg;
-          double massInv = part_total.M();
-          double openAngle = part_trg.Angle(part_ass.Vect());
-
-          if(cutPara.mass_trg==0 && cutPara.mass_ass==0 && openAngle>(0.22/part_total.Pt()-0.07/part_total.Pt()/part_total.Pt()) && openAngle<(0.65/part_total.Pt()-0.3/part_total.Pt()/part_total.Pt()))
-          {
-            hInvMass_Background->Fill(massInv);
-            hInvMassVsPt_Background->Fill(part_total.Pt(),massInv);
-          }
-          hOpenAngleVsPt_Background->Fill(part_total.Pt(),openAngle);
-*/
 
 //          nMultCorr_trg = 1; // turn off normalization temperorily
 
@@ -399,7 +352,7 @@ void DiHadronCorrelationMultiAnalyzer::FillHistsBackground(const DiHadronCorrela
 //          if(cutPara.IsPtWeightTrg) effweight = effweight / pt_trg;
 
           // Direct calculation of Fourier harmonics for pairs
-          if(cutPara.IsHarmonics)// && fabs(deltaEta)>2) 
+          if(cutPara.IsHarmonics && fabs(deltaEta)>2) 
           {
             for(int nn = 0; nn<5; nn++)
             {

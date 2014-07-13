@@ -438,14 +438,14 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
   double thrust = 0;
   double recoil = 0;
   double sphericity = 0;
-  if(cutPara.IsDoEventShape)
-  {
-    EventShape t((eventcorr->pVect_all).begin(), (eventcorr->pVect_all).end());
-    t.SetTran();
-    thrust = t.thrust();
-    recoil = t.recoil();
-    sphericity = t.sphericity();
-  }
+//  if(cutPara.IsDoEventShape)
+//  {
+//    EventShape t((eventcorr->pVect_all).begin(), (eventcorr->pVect_all).end());
+//    t.SetTran();
+//    thrust = t.thrust();
+//    recoil = t.recoil();
+//    sphericity = t.sphericity();
+//  }
 
   // Fill gen-level information ntuple
   if(cutPara.IsHIGenInfoNtuple)
@@ -495,7 +495,7 @@ void DiHadronCorrelationMultiBaseFWLite::Analyze(int ievt)
 //    eventNtuple->Fill(ntupledata);
   }
 
-  if(cutPara.IsInvMass) FillHistsInvariantMass(*eventcorr);
+//  if(cutPara.IsInvMass) FillHistsInvariantMass(*eventcorr);
 
   eventcorr->nmult=nMult;
   eventcorr->centbin=hiCentrality;
@@ -890,10 +890,11 @@ void DiHadronCorrelationMultiBaseFWLite::LoopGenJets(bool istrg)
      double phi = p.phi();
      double pt  = p.pt();
      double charge = 0;
+     double mass = p.mass();
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(pt,eta,phi,charge,effweight);
-     else AssignAssPtBins(pt,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(pt,eta,phi,mass,charge,effweight);
+     else AssignAssPtBins(pt,eta,phi,mass,charge,effweight);
    }   
 }
 
@@ -917,10 +918,11 @@ void DiHadronCorrelationMultiBaseFWLite::LoopParticles(bool istrg, int pdgid, bo
      double pt  = p.pt();
 //     double pt  = p.energy();
      double charge = p.charge();
+     double mass = p.mass();
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(pt,eta,phi,charge,effweight);
-     else AssignAssPtBins(pt,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(pt,eta,phi,mass,charge,effweight);
+     else AssignAssPtBins(pt,eta,phi,mass,charge,effweight);
    }
 }
 
@@ -1040,8 +1042,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopTracks(bool istrg, TString input, i
      double trgweight = GetTrgWeight(nMult);
 
      if(charge!=icharge && icharge!=-999) continue;
-     if(istrg && !cutPara.IsLeadTrack) AssignTrgPtBins(pt,eta,phi,charge,effweight*trgweight);
-     else AssignAssPtBins(pt,eta,phi,charge,effweight*trgweight);
+     if(istrg && !cutPara.IsLeadTrack) AssignTrgPtBins(pt,eta,phi,cutPara.mass_trg,charge,effweight*trgweight);
+     else AssignAssPtBins(pt,eta,phi,cutPara.mass_ass,charge,effweight*trgweight);
    }
 /*
    if(cutPara.IsLeadTrack && istrg) 
@@ -1075,8 +1077,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopEcalSC(bool istrg)
      double et  = supercluster.energy()/cosh(eta);
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    }
 
    fwlite::Handle<std::vector<reco::SuperCluster> > superclustersfwd;
@@ -1090,8 +1092,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopEcalSC(bool istrg)
      double et  = superclusterfwd.energy()/cosh(eta);
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    }
 }
 
@@ -1109,8 +1111,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopEcalBC(bool istrg)
      double et  = basiccluster.energy()/cosh(eta);
      
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    } 
 
    fwlite::Handle<std::vector<reco::BasicCluster> > basicclustersfwd;
@@ -1124,8 +1126,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopEcalBC(bool istrg)
      double et  = basicclusterfwd.energy()/cosh(eta);
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    }
 }
 
@@ -1185,8 +1187,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopJets(bool istrg)
      }
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    } 
 }
 
@@ -1205,8 +1207,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopMuons(bool istrg)
      double charge = muon.charge();
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(pt,eta,phi,charge,effweight);
-     else AssignAssPtBins(pt,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(pt,eta,phi,cutPara.mass_trg,charge,effweight);
+     else AssignAssPtBins(pt,eta,phi,cutPara.mass_ass,charge,effweight);
    }
 }
 
@@ -1226,6 +1228,7 @@ void DiHadronCorrelationMultiBaseFWLite::LoopPFCandidates(bool istrg, reco::PFCa
      double etot = pfCand.ecalEnergy()+pfCand.hcalEnergy();
 //     double etot = pfCand.hcalEnergy();
      double charge = pfCand.charge();
+     double mass = pfCand.mass();
 
      if(reco::PFCandidate::ParticleType(pfCand.particleId())!=pfID) continue;
 
@@ -1233,8 +1236,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopPFCandidates(bool istrg, reco::PFCa
      hBetaVsP->Fill(p,p/etot);
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(pt,eta,phi,charge,effweight);
-     else AssignAssPtBins(pt,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(pt,eta,phi,mass,charge,effweight);
+     else AssignAssPtBins(pt,eta,phi,mass,charge,effweight);
    }
 }
 
@@ -1293,8 +1296,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopPionZeros(bool istrg, double massSh
 //       if(massInv<(mass-2*width) || massInv>(mass+2*width) || openAngle<(0.22/pt_pionzero-0.07/pt_pionzero/pt_pionzero) || openAngle>(0.65/pt_pionzero-0.3/pt_pionzero/pt_pionzero)) continue;
        if(massInv>0.18 || massInv<0.1) continue;
        double effweight = 1.0;
-       if(istrg) AssignTrgPtBins(pt_pionzero,eta_pionzero,phi_pionzero,0,effweight);
-       else AssignAssPtBins(pt_pionzero,eta_pionzero,phi_pionzero,0,effweight);
+       if(istrg) AssignTrgPtBins(pt_pionzero,eta_pionzero,phi_pionzero,massInv,0,effweight);
+       else AssignAssPtBins(pt_pionzero,eta_pionzero,phi_pionzero,massInv,0,effweight);
      }
    }
 }
@@ -1317,8 +1320,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopCaloTower(bool istrg)
      
      if(calotower.energy()<3) continue;
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    }
 }
 
@@ -1352,8 +1355,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopEcalRecHits(bool istrg)
      double et  = ecalrechitee.id().ienergy()/cosh(eta);
      
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(et,eta,phi,charge,effweight);
-     else AssignAssPtBins(et,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(et,eta,phi,0,charge,effweight);
+     else AssignAssPtBins(et,eta,phi,0,charge,effweight);
    }
 */
 }
@@ -1441,8 +1444,8 @@ void DiHadronCorrelationMultiBaseFWLite::LoopV0Candidates(bool istrg, TString ca
      if(!istrg && fabs(mass-cutPara.mass_ass)>0.015) continue;
 
      double effweight = 1.0;
-     if(istrg) AssignTrgPtBins(pt,eta,phi,charge,effweight);
-     else AssignAssPtBins(pt,eta,phi,charge,effweight);
+     if(istrg) AssignTrgPtBins(pt,eta,phi,mass,charge,effweight);
+     else AssignAssPtBins(pt,eta,phi,mass,charge,effweight);
    }
 }
 
@@ -1556,7 +1559,7 @@ void DiHadronCorrelationMultiBaseFWLite::GetSimVertices()
     hZVtxSim->Fill(zVtxSim);
     hXYVtxSim->Fill(xVtxSim,yVtxSim);
 }
-
+/*
 //--------------- Calculate two-particle invariant mass distributions ----------
 void DiHadronCorrelationMultiBaseFWLite::FillHistsInvariantMass(const DiHadronCorrelationEvent& eventcorr)
 {     
@@ -1589,8 +1592,8 @@ void DiHadronCorrelationMultiBaseFWLite::FillHistsInvariantMass(const DiHadronCo
       }
     }
 }
-
-void DiHadronCorrelationMultiBaseFWLite::AssignTrgPtBins(double pt, double eta, double phi, double charge, double effweight)
+*/
+void DiHadronCorrelationMultiBaseFWLite::AssignTrgPtBins(double pt, double eta, double phi, double mass, double charge, double effweight)
 {
    if(cutPara.IsPtWeightTrg) effweight = effweight / pt;
 
@@ -1601,8 +1604,8 @@ void DiHadronCorrelationMultiBaseFWLite::AssignTrgPtBins(double pt, double eta, 
    hPtAll_trg->Fill(pt,1.0/hPtAll_trg->GetBinWidth(hPtAll_trg->FindBin(pt)));
    hPtCorrAll_trg->Fill(pt,1./effweight/hPtAll_trg->GetBinWidth(hPtAll_trg->FindBin(pt)));
 
-   TVector3 pvector;
-   pvector.SetPtEtaPhi(pt,eta,phi);
+   TLorentzVector pvector;
+   pvector.SetPtEtaPhiM(pt,eta,phi,mass);
    if(pt>0.4 && fabs(eta)<2.4) (eventcorr->pVect_all).push_back(pvector);
    for(int pttrgbin=0;pttrgbin<(int)(cutPara.pttrgmin.size());pttrgbin++)
    {
@@ -1623,7 +1626,7 @@ void DiHadronCorrelationMultiBaseFWLite::AssignTrgPtBins(double pt, double eta, 
    }
 }
 
-void DiHadronCorrelationMultiBaseFWLite::AssignAssPtBins(double pt, double eta, double phi, double charge, double effweight)
+void DiHadronCorrelationMultiBaseFWLite::AssignAssPtBins(double pt, double eta, double phi, double mass, double charge, double effweight)
 {
    if(cutPara.IsPtWeightAss) effweight = effweight / pt;
 
@@ -1634,8 +1637,8 @@ void DiHadronCorrelationMultiBaseFWLite::AssignAssPtBins(double pt, double eta, 
    hPtAll_ass->Fill(pt);
    hPtCorrAll_ass->Fill(pt,effweight);
 
-   TVector3 pvector;
-   pvector.SetPtEtaPhi(pt,eta,phi);
+   TLorentzVector pvector;
+   pvector.SetPtEtaPhiM(pt,eta,phi,mass);
    for(int ptassbin=0;ptassbin<(int)(cutPara.ptassmin.size());ptassbin++)
    {
      if(GetPtassBin(pt,eta,ptassbin))

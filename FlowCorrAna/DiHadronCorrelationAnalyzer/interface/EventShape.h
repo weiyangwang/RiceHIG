@@ -29,6 +29,7 @@
  */
 #include <vector>
 #include <TVector3.h>
+#include <TLorentzVector.h>
 
 class EventShape  {
 public:

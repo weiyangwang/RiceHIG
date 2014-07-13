@@ -85,7 +85,7 @@ void EventPlaneAnalyzerFWLite::FillHistsSignal(const DiHadronCorrelationEvent& e
    unsigned int nasssize = eventcorr.pVect_ass[0].size();
    for(unsigned int n=0;n<nasssize;n++)
    {
-     TVector3 pvector = (eventcorr.pVect_ass[0])[n];
+     TLorentzVector pvector = (eventcorr.pVect_ass[0])[n];
      double eta = pvector.Eta();
      double phi = pvector.Phi();
      double pt  = pvector.Pt();
@@ -103,7 +103,7 @@ void EventPlaneAnalyzerFWLite::FillHistsSignal(const DiHadronCorrelationEvent& e
 
      for(unsigned int n=0;n<ntrgsize;n++)
      {
-       TVector3 pvector = (eventcorr.pVect_trg[i])[n];	  
+       TLorentzVector pvector = (eventcorr.pVect_trg[i])[n];	  
        double effweight = (eventcorr.effVect_trg[i])[n];
        double chg = (eventcorr.chgVect_trg[i])[n];
        double eta = pvector.Eta();

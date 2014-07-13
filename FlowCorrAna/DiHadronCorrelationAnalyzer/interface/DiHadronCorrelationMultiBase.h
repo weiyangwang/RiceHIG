@@ -216,8 +216,8 @@ class DiHadronCorrelationMultiBase : public edm::EDAnalyzer {
    virtual void LoopV0Candidates(const edm::Event& iEvent, const edm::EventSetup& iSetup, bool istrg, TString candtype);
    virtual void GetVertices(const edm::Event& iEvent, const edm::EventSetup& iSetup);
    virtual void NormalizeHists() {};
-   virtual void AssignTrgPtBins(double pt, double eta, double phi, double charge, double effweight);
-   virtual void AssignAssPtBins(double pt, double eta, double phi, double charge, double effweight);
+   virtual void AssignTrgPtBins(double pt, double eta, double phi, double mass, double charge, double effweight);
+   virtual void AssignAssPtBins(double pt, double eta, double phi, double mass, double charge, double effweight);
    virtual int  GetCentralityBin(const edm::Event& iEvent, const edm::EventSetup& iSetup);
    virtual double GetDeltaEta(double eta_trg, double eta_ass);
    virtual double GetDeltaPhi(double phi_trg, double phi_ass);

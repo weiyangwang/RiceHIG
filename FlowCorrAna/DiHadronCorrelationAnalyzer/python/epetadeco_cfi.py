@@ -5,6 +5,7 @@ epetadeco_ana = cms.EDAnalyzer('EPEtaDecoAnalyzer',
   TrgTrackCollection = cms.string('generalTracks'),
   VertexCollection = cms.string('offlinePrimaryVertices'),
   GenParticleCollection = cms.string('genParticles'),
+  V0CandidateCollection = cms.string('generalV0CandidatesNew'),
 
   TriggerID = cms.string('Track'),
   AssociateID = cms.string('CaloTower'),
@@ -56,5 +57,6 @@ epetadeco_ana = cms.EDAnalyzer('EPEtaDecoAnalyzer',
   IsFullMatrix = cms.bool(True),
   IsPtWeightTrg = cms.bool(False),
   IsPtWeightAss = cms.bool(True),
-  IsTrkQuality = cms.bool(True)
+  IsTrkQuality = cms.bool(True),
+  IsDebug = cms.bool(False)
 )

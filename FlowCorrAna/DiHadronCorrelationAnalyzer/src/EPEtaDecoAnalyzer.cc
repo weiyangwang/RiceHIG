@@ -94,8 +94,7 @@ void EPEtaDecoAnalyzer::FillHistsSignal(const DiHadronCorrelationEvent& eventcor
 
     for(unsigned int ntrg=0;ntrg<ntrgsize;ntrg++)
     {
-      TVector3 pvector_trg = (eventcorr.pVect_trg[0])[ntrg];	  
-      TLorentzVector part_trg(pvector_trg,sqrt(cutPara.mass_trg*cutPara.mass_trg+pvector_trg.Mag()*pvector_trg.Mag()));
+      TLorentzVector pvector_trg = (eventcorr.pVect_trg[0])[ntrg];	  
       double effweight_trg = (eventcorr.effVect_trg[0])[ntrg];
       double chg_trg = (eventcorr.chgVect_trg[0])[ntrg];
       double eta_trg = pvector_trg.Eta();
@@ -104,8 +103,7 @@ void EPEtaDecoAnalyzer::FillHistsSignal(const DiHadronCorrelationEvent& eventcor
 
       for(unsigned int nass=0;nass<nasssize;nass++)
       {
-        TVector3 pvector_ass = (eventcorr.pVect_ass[0])[nass];   
-        TLorentzVector part_ass(pvector_ass,sqrt(cutPara.mass_ass*cutPara.mass_ass+pvector_ass.Mag()*pvector_ass.Mag()));
+        TLorentzVector pvector_ass = (eventcorr.pVect_ass[0])[nass];   
         double effweight_ass = (eventcorr.effVect_ass[0])[nass];
         double chg_ass = (eventcorr.chgVect_ass[0])[nass];
         double eta_ass = pvector_ass.Eta();
@@ -155,8 +153,7 @@ void EPEtaDecoAnalyzer::FillHistsBackground(const DiHadronCorrelationEvent& even
 
       for(unsigned int ntrg=0;ntrg<ntrgsize;ntrg++)
       {
-        TVector3 pvector_trg = (eventcorr_trg.pVect_trg[0])[ntrg];	  
-        TLorentzVector part_trg(pvector_trg,sqrt(cutPara.mass_trg*cutPara.mass_trg+pvector_trg.Mag()*pvector_trg.Mag()));
+        TLorentzVector pvector_trg = (eventcorr_trg.pVect_trg[0])[ntrg];	  
         double effweight_trg = (eventcorr_trg.effVect_trg[0])[ntrg];
         double chg_trg = (eventcorr_trg.chgVect_trg[0])[ntrg];
         double eta_trg = pvector_trg.Eta();
@@ -165,8 +162,7 @@ void EPEtaDecoAnalyzer::FillHistsBackground(const DiHadronCorrelationEvent& even
 
         for(unsigned int nass=0;nass<nasssize;nass++)
         {
-          TVector3 pvector_ass = (eventcorr_ass.pVect_ass[0])[nass];   
-          TLorentzVector part_ass(pvector_ass,sqrt(cutPara.mass_ass*cutPara.mass_ass+pvector_ass.Mag()*pvector_ass.Mag()));
+          TLorentzVector pvector_ass = (eventcorr_ass.pVect_ass[0])[nass];   
           double effweight_ass = (eventcorr_ass.effVect_ass[0])[nass];
           double chg_ass = (eventcorr_ass.chgVect_ass[0])[nass];
           double eta_ass = pvector_ass.Eta();
